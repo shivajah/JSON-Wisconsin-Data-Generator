@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<info>
+    <dataset>
+        <name>testds</name>
+        <cardinality>1000</cardinality>
+    </dataset>
+    <schema>
+        <field position="1">
+            <name>id</name>
+            <type>INTEGER</type>
+            <domain>hundred</domain>
+            <order>random</order>
+            <declared>true</declared>
+            <optional>
+                <value>false</value>
+                <missing-percentage>0</missing-percentage>
+            </optional>
+            <null-percentage>0</null-percentage>
+        </field>
+        <field position="2">
+            <name>num</name>
+            <type>INTEGER</type>
+            <domain>five</domain>
+            <order>sequential</order>
+            <declared>true</declared>
+            <optional>
+                <value>false</value>
+                <missing-percentage>0</missing-percentage>
+            </optional>
+            <null-percentage>0</null-percentage>
+        </field>
+        <field position="3"> 
+            <name>name</name> 
+            <type>String</type> 
+            <length>100</length>  
+            <order>random</order> 
+            <domain>jobs</domain> 
+            <order>random</order> 
+            <declared>true</declared> 
+            <optional>  
+                <value>true</value> 
+                <missing-percentage>0</missing-percentage> 
+            </optional>  
+            <null-percentage>0</null-percentage>  
+        </field> 
+    </schema>
+    <file>
+        <name>testfile.txt</name>
+        <partitions>2</partitions>
+    </file>
+</info>

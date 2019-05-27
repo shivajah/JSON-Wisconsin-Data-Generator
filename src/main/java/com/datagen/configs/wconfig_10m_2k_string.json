@@ -1,0 +1,55 @@
+[
+  {
+    "dataset": {
+      "name": "wisconsin",
+      "cardinality":9999999
+    },
+    "file":{
+      "name":"wisconsin_10m_without_big_object_without_varlen_string_2k.adm",
+      "partitions":1
+    },
+    "fields":[
+      {
+        "name":"unique1",
+        "type":"integer",
+        "order":"random",
+        "declared":true,
+        "optional":false,
+        "missings":0,
+        "nullable":true,
+        "variableLength":false,
+        "standardDeviation":0,
+        "word":false,
+        "nulls":0
+      },
+      {
+        "name":"unique2",
+        "type":"integer",
+        "order":"sequential",
+        "declared":true,
+        "optional":false,
+        "missings":0,
+        "nullable":false,
+        "variableLength":false,
+        "standardDeviation":0,
+        "word":false,
+        "nulls":0
+      },
+      {
+        "name":"stringHundredPercentLengthTwoK",
+        "type":"string",
+        "length":"2120",
+        "range":1,
+        "order":"random",
+        "declared":true,
+        "optional":false,
+        "missings":0,
+        "nullable":false,
+        "variableLength":false,
+        "standardDeviation":0,
+        "word":false,
+        "nulls":0
+      }
+    ]
+  }
+]

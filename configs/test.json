@@ -1,0 +1,59 @@
+[
+  {
+    "dataset": {
+      "name": "wisconsin",
+      "cardinality":10
+    },
+    "file":{
+      "name":"test_largRecords.adm",
+      "partitions":1
+    },
+    "fields":[
+      {
+        "name":"unique1",
+        "type":"integer",
+        "order":"random",
+        "declared":true,
+        "optional":false,
+        "missings":0,
+        "nullable":true,
+        "variableLength":false,
+        "standardDeviation":0,
+        "word":false,
+        "nulls":0
+      },
+      {
+        "name":"unique2",
+        "type":"integer",
+        "order":"sequential",
+        "range":4,
+        "declared":true,
+        "optional":false,
+        "missings":0,
+        "nullable":false,
+        "variableLength":false,
+        "standardDeviation":0,
+        "normalDistribution":false,
+        "shape":0.5,
+        "scale":1,
+        "word":false,
+        "nulls":0
+      },
+      {
+        "name":"stringu2",
+        "type":"string",
+        "length":"33792",
+        "order":"random",
+        "declared":true,
+        "optional":false,
+        "missings":0,
+        "nullable":false,
+        "variableLength":true,
+        "normalDistribution":true,
+        "standardDeviation":0,
+        "nulls":0
+      }
+    ]
+  }
+
+]

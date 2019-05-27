@@ -1,0 +1,21 @@
+USE WisconsinDV;
+
+create feed WisconsinFeed15 with {
+ "adapter-name" : "localfs",
+ "path" : "127.0.0.1:19001:///Users/shiva/Documents/Experiments-w2017/ONEMILTUP1p_0.adm",
+ "format" : "adm",
+ "type-name" : "WisconsinType",
+ "tuple-interval" : "10"
+};
+
+connect feed WisconsinFeed15 to dataset w1;
+connect feed WisconsinFeed15 to dataset w2;
+connect feed WisconsinFeed15 to dataset w3;
+connect feed WisconsinFeed15 to dataset w4;
+connect feed WisconsinFeed15 to dataset w5;
+connect feed WisconsinFeed15 to dataset w6;
+connect feed WisconsinFeed15 to dataset w7;
+connect feed WisconsinFeed15 to dataset w8;
+connect feed WisconsinFeed15 to dataset w9;
+
+    start feed WisconsinFeed15;

@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<config>
+<info>
+    <dataset>
+        <name>testds</name>
+        <cardinality>10</cardinality>
+    </dataset>
+    <schema>
+        <field> 
+            <name>name</name> 
+            <type>String</type> 
+            <length>10</length>  
+            <order>random</order> 
+            <declared>true</declared> 
+            <optional>  
+                <value>true</value> 
+                <missing>0</missing> 
+            </optional>  
+            <null>0</null>  
+        </field>
+    </schema>
+    <file>
+        <name>testfile.txt</name>
+        <partitions>2</partitions>
+    </file>
+</info>
+<info>
+<dataset>
+    <name>testds</name>
+    <cardinality>1000</cardinality>
+</dataset>
+<schema>
+    <field>
+        <name>id</name>
+        <type>INTEGER</type>
+        <even>true</even>
+        <order>random</order>
+        <declared>true</declared>
+        <optional>
+            <value>false</value>
+            <missing>0</missing>
+        </optional>
+        <null>0</null>
+    </field>
+    <field> 
+        <name>name</name> 
+        <type>String</type> 
+        <length>10</length>  
+        <order>random</order> 
+        <declared>true</declared> 
+        <optional>  
+            <value>true</value> 
+            <missing>0</missing> 
+        </optional>  
+        <null>0</null>  
+    </field>
+    <field> 
+        <name>lastname</name> 
+        <type>String</type> 
+        <length>10</length>  
+        <order>random</order> 
+        <declared>true</declared> 
+        <optional>  
+            <value>true</value> 
+            <missing>0</missing> 
+        </optional>  
+        <null>0</null>  
+    </field>
+</schema>
+<file>
+    <name>testfile5.txt</name>
+    <partitions>2</partitions>
+</file>
+</info>
+</config>

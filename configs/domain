@@ -1,0 +1,5 @@
+String : jobs = {physician,economist,developer,biologist,accountant,lawyer,pharmacist,teacher,trainer,student}
+String : hundredString=<AA,100>
+Integer :  hundred =<1,100>
+Integer : five={1,2,3,4,5}
+Integer : fiveRange=<1,5>

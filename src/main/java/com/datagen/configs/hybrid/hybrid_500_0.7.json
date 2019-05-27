@@ -1,0 +1,162 @@
+[
+  {
+    "dataset": {
+      "name": "wisconsin",
+<<<<<<< HEAD
+      "cardinality": 5000,
+      "fileSize" : 100
+    },
+    "file":{
+      "name":"wisconsin_test.adm",
+=======
+      "cardinality": 500
+    },
+    "file":{
+      "name":"wisconsin_hybrid_500_0.7.adm",
+>>>>>>> a4fe623... Added bernoulli distribution for large/small records
+      "partitions":1
+    },
+    "fields":[
+      {
+        "name":"unique1",
+        "type":"integer",
+        "order":"random",
+        "declared":true,
+        "optional":false,
+        "missings":0,
+        "nullable":true,
+        "variableLength":false,
+        "standardDeviation":0,
+        "word":false,
+        "nulls":0
+      },
+      {
+        "name":"unique2",
+        "type":"integer",
+        "order":"sequential",
+        "declared":true,
+        "optional":false,
+        "missings":0,
+        "nullable":false,
+        "variableLength":false,
+        "standardDeviation":0,
+        "word":false,
+        "nulls":0
+      },
+      {
+        "name":"onePercent",
+        "type":"integer",
+        "order":"random",
+        "range":100,
+        "declared":true,
+        "optional":false,
+        "missings":0,
+        "nullable":false,
+        "variableLength":false,
+        "standardDeviation":0,
+        "word":false,
+        "nulls":0
+      },
+      {
+        "name":"tenPercent",
+        "type":"integer",
+        "order":"random",
+        "range":10,
+        "declared":true,
+        "optional":false,
+        "missings":0,
+        "nullable":false,
+        "variableLength":false,
+        "standardDeviation":0,
+        "word":false,
+        "nulls":0
+      },
+      {
+        "name":"twentyFivePercent",
+        "type":"integer",
+        "order":"random",
+        "range":4,
+        "declared":true,
+        "optional":false,
+        "missings":0,
+        "nullable":false,
+        "variableLength":false,
+        "standardDeviation":0,
+        "word":false,
+        "nulls":0
+      },
+      {
+        "name":"fiftyPercent",
+        "type":"integer",
+        "order":"random",
+        "range":2,
+        "declared":true,
+        "optional":false,
+        "missings":0,
+        "nullable":false,
+        "variableLength":false,
+        "standardDeviation":0,
+        "word":false,
+        "nulls":0
+      },
+      {
+        "name":"stringu1",
+        "type":"string",
+<<<<<<< HEAD
+        "length":100,
+=======
+        "length":"100",
+>>>>>>> a4fe623... Added bernoulli distribution for large/small records
+        "order":"sequential",
+        "declared":true,
+        "optional":false,
+        "missings":0,
+        "nullable":false,
+        "variableLength":false,
+        "standardDeviation":0,
+        "word":false,
+        "nulls":0
+      },
+      {
+        "name":"stringu2",
+        "type":"string",
+<<<<<<< HEAD
+        "length" : 32768,
+        "range": 100,
+=======
+        "length":"32768",
+        "range":100,
+>>>>>>> a4fe623... Added bernoulli distribution for large/small records
+        "order":"random",
+        "declared":true,
+        "optional":false,
+        "missings":0,
+        "nullable":false,
+        "variableLength":true,
+<<<<<<< HEAD
+        "normalDistribution":true,
+        "bernoulliDistribution":false,
+=======
+        "normalDistribution":false,
+        "bernoulliDistribution":true,
+>>>>>>> a4fe623... Added bernoulli distribution for large/small records
+        "standardDeviation":1,
+        "shape":1.5,
+        "scale":1,
+        "word":false,
+        "nulls":0,
+<<<<<<< HEAD
+        "probLargeRecord": 0,
+        "minSizeSmall": 100,
+        "maxSizeSmall": 32000,
+=======
+        "probLargeRecord": 0.3,
+        "minSizeSmall": 100,
+        "maxSizeSmall": 32767,
+>>>>>>> a4fe623... Added bernoulli distribution for large/small records
+        "minSizeLarge": 32768,
+        "maxSizeLarge": 163840
+      }
+    ]
+  }
+]

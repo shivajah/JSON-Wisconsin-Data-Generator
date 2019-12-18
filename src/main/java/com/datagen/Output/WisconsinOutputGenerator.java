@@ -18,8 +18,6 @@ import com.datagen.Generators.wisconsingenerators.WisconsinGenerator;
 import com.datagen.Generators.wisconsingenerators.WisconsinStringGenerator;
 import com.datagen.schema.Schema;
 
-import javafx.util.Pair;
-
 /**
  * Created by shiva on 3/10/18.
  */
@@ -31,7 +29,7 @@ public class WisconsinOutputGenerator {
     private Map<Integer, BufferedOutputStream> streams;
     private long maxRecordLength;
     private ExecutorService executorService;
-    private Map<Integer, Pair<Integer, Integer>> executorsToStartAndEnd;
+    private Map<Integer, Map<Integer, Integer>> executorsToStartAndEnd;
     private int numOfExecutors;
     private static final DecimalFormat decFormat = new DecimalFormat("#.######");
     public double totalFileSize;
@@ -77,11 +75,11 @@ public class WisconsinOutputGenerator {
         for (int i = 0; i < numOfExecutors; i++) {
             int start = length * i;
 
-            Pair<Integer, Integer> p;
+            Map<Integer, Integer> p;
             if (i == numOfExecutors - 1) {
-                p = new Pair<>(start, schema.getCardinality());
+                p = new HashMap<>(start, schema.getCardinality());
             } else {
-                p = new Pair<>(start, start + length);
+                p = new HashMap<>(start, start + length);
             }
             executorsToStartAndEnd.put(i, p);
         }
@@ -93,8 +91,8 @@ public class WisconsinOutputGenerator {
             executorService.submit(() -> {
 
                 //
-                System.out.println("start index: " + executorsToStartAndEnd.get(readerId).getKey() + " end index: "
-                        + executorsToStartAndEnd.get(readerId).getValue());
+                System.out.println("start index: " + executorsToStartAndEnd.get(readerId).keySet() + " end index: "
+                        + executorsToStartAndEnd.get(readerId).values());
 
                 int recordCount = 0;
                 long totalRecordLength = 0;

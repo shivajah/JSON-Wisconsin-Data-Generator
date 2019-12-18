@@ -24,7 +24,7 @@ public class Server {
     public static void main(String[] args) throws Exception {
         String configFile = "/Users/shiva/workspace/datagen/src/main/java/com/datagen/configs/wisconsin_1GB_std_zero_fixedLength_noBigObject.json";
         if (args.length > 0) {
-            configFile = args[0];
+            configFile = args[1];
             System.out.println(
                    "A config file is provided. The generator will use the provided config file:" + configFile);
         } else {

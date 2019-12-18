@@ -16,8 +16,9 @@ import com.datagen.schema.Domain.Domain;
 import com.datagen.schema.Domain.IntegerDomain;
 import com.datagen.schema.Domain.Range;
 import com.datagen.schema.Domain.StringDomain;
-import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.core.type.TypeReference;
+
 
 /**
  * Created by shiva on 3/1/18.

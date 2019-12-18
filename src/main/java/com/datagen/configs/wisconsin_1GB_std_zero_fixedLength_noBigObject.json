@@ -3,10 +3,10 @@
     "dataset": {
       "name": "wisconsin",
       "cardinality":999999,
-      "fileSize" : 51200
+      "fileSize" : 40960
     },
     "file":{
-      "name":"wisconsin_50GB_std_zero_fixedLength_noBigObject.adm",
+      "name":"wisconsin_40GB_std_zero_fixedLength_noBigObject.adm",
       "partitions":1
     },
     "fields":[

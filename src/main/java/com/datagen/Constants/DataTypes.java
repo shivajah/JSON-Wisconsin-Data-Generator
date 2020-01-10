@@ -13,12 +13,4 @@ public class DataTypes {
         INTEGER,
         BINARY
     }
-
-    public static Map<String, String> toMap() {
-        Map<String, String> map = new LinkedHashMap<>();
-        for (DataType d : DataType.values()) {
-            map.put(d.name(), d.name());
-        }
-        return map;
-    }
 }

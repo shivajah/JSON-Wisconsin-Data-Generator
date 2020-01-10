@@ -8,4 +8,5 @@ public class Dataset {
     public int cardinality;
     public float probLargeRecord;
     public int fileSize;
+    public int batchSize;
 }

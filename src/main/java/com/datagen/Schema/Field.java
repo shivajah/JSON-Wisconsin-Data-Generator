@@ -39,7 +39,7 @@ public class Field {
     private int maxSizeLarge = 5 * 32 * 1024;
 
 
-    public int getSizeInBytes(int cardinality) {
+    public long getSizeInBytes(long cardinality) {
         if (range > 0) {
             cardinality = range;
         }

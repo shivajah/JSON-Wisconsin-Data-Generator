@@ -14,7 +14,6 @@ public class PField {
     public int missings;
     public boolean nullable;
     public int nulls;
-    public String domain;
     public boolean even;
     public boolean odd;
     public boolean variableLength = false;

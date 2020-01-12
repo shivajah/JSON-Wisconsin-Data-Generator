@@ -2,7 +2,7 @@
   {
     "dataset": {
       "name": "wisconsin",
-      "cardinality":999999,
+      "cardinality":99999999,
       "fileSize" : 40960,
       "batchSize" : 1000
     },

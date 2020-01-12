@@ -12,8 +12,8 @@ public abstract class WisconsinGenerator {
     Schema schema;
     int fieldId;
     Random rand;
-    int nextNull;
-    int nextMissing;
+    long nextNull;
+    long nextMissing;
     DataType generatorType;
 
     public WisconsinGenerator() {
@@ -36,26 +36,26 @@ public abstract class WisconsinGenerator {
         return (seed);
     }
 
-    public int nextNull(int i) {
-        int val = nextNullOrMissing(i, schema.getFields().get(fieldId).getNulls());
+    public long nextNull(int i) {
+        long val = nextNullOrMissing(i, schema.getFields().get(fieldId).getNulls());
         decreaseNulls();
         return val;
     }
 
-    public int nextMissing(int i) {
-        int val = nextNullOrMissing(i, schema.getFields().get(fieldId).getMissings());
+    public long nextMissing(int i) {
+        long val = nextNullOrMissing(i, schema.getFields().get(fieldId).getMissings());
         decreaseMissings();
         return val;
     }
 
-    private int nextNullOrMissing(int i, int numRemnullOrMissing) {
+    private long nextNullOrMissing(int i, int numRemnullOrMissing) {
         if (numRemnullOrMissing <= 0) {
             return schema.getCardinality() * 2;
         }
-        int max = schema.getCardinality() / numRemnullOrMissing;
+        long max = schema.getCardinality() / numRemnullOrMissing;
         if (i > max && max * 2 <= schema.getCardinality() - 1)
             max = max * 2;
-        return rand.nextInt(max + 1 - i) + i;
+        return rand.nextLong()/max + i;
     }
 
     private void decreaseNulls() {

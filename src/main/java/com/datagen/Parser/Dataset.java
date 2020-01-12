@@ -5,8 +5,8 @@ package com.datagen.Parser;
  */
 public class Dataset {
     public String name;
-    public int cardinality;
+    public long cardinality;
     public float probLargeRecord;
-    public int fileSize;
+    public long fileSize;
     public int batchSize;
 }

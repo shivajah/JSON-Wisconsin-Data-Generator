@@ -17,9 +17,6 @@ import com.datagen.Constants.StringWordList;
 import com.datagen.Schema.Field;
 import com.datagen.Schema.Schema;
 
-/**
- * Created by shiva on 3/7/18.
- */
 public class WisconsinStringGenerator extends WisconsinGenerator {
     private static final char[] VALUES = { '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'A', 'B', 'C', 'D', 'E',
             'F' };
@@ -65,22 +62,6 @@ public class WisconsinStringGenerator extends WisconsinGenerator {
     }
 
     public String next(long seed) {
-        if (nextNull < seed) {
-            nextNull = nextNull(Math.toIntExact(seed));
-            schema.getFields().get(fieldId).setNulls(f.getNulls() + 1);
-        }
-        if (nextMissing < seed) {
-            nextMissing = nextMissing(Math.toIntExact(seed));
-            schema.getFields().get(fieldId).setMissings(f.getMissings() + 1);
-        }
-        if (nextNull <= nextMissing && nextNull == seed) {
-            nextNull = nextNull(Math.toIntExact(seed) + 1);
-            return null;
-        }
-        if (nextMissing <= nextNull && nextMissing == seed) {
-            nextMissing = nextMissing(Math.toIntExact(seed) + 1);
-            return "";
-        }
         if (f.getOrder() == Order.order.RANDOM) {
             seed = rand(seed, schema.getCardinality());
         }
@@ -110,7 +91,6 @@ public class WisconsinStringGenerator extends WisconsinGenerator {
                 // For this case, the length is regarded as the average length.
                 //                return generateRandomHexChars();
                 String result= generateRandomHexCharsGamma(f.getStringLength());
-//                System.out.println(result);
                 return result;
             }
         }

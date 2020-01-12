@@ -11,10 +11,6 @@ import com.datagen.Schema.Schema;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.core.type.TypeReference;
 
-
-/**
- * Created by shiva on 3/1/18.
- */
 public class Parser {
     public List<Schema> parseWisconsinConfigFile(String configFile) throws Exception {
         List<SchemaForParser> schemas = new LinkedList<>();
@@ -39,7 +35,6 @@ public class Parser {
         Schema schema = new Schema();
         List<Field> fields = new LinkedList<>();
         schema.setCardinality(sp.dataset.cardinality);
-        schema.setDatasetName(sp.dataset.name);
         schema.setFileName(sp.file.name);
         schema.setNumOfPartitions(sp.file.partitions);
         schema.setFileSize(sp.dataset.fileSize);

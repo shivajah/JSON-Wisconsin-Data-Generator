@@ -18,26 +18,8 @@ public class WisconsinNumberGenerator extends WisconsinGenerator {
 
     @Override
     public Object next(long seed) {
-        if (nextNull < seed) {
-            nextNull = nextNull(Math.toIntExact(seed));
-            schema.getFields().get(fieldId).setNulls(field.getNulls() + 1);
-        }
-        if (nextMissing < seed) {
-            nextMissing = nextMissing(Math.toIntExact(seed));
-            schema.getFields().get(fieldId).setMissings(field.getMissings() + 1);
-        }
-
-        if (nextNull <= nextMissing && nextNull == seed) {
-            nextNull = nextNull(Math.toIntExact(seed) + 1);
-            return null;
-        }
-        if (nextMissing <= nextNull && nextMissing == seed) {
-            nextMissing = nextMissing(Math.toIntExact(seed) + 1);
-            return Long.MAX_VALUE;
-        }
         long result;
-
-        //if(field.getDomain()== null){//no domain provided==> use cardinality and Jim Gray's algo
+        // Use cardinality and Jim Gray's algo
         if (field.getOrder() == Order.order.RANDOM)
             result = rand(seed, schema.getCardinality());
         else
@@ -54,14 +36,11 @@ public class WisconsinNumberGenerator extends WisconsinGenerator {
 
         if (!field.isNormalDistribution()) {
 
-            int range = field.getRange() > 0? field.getRange():schema.getCardinality();
-            //System.out.println("range "+range);
+            long range = field.getRange() > 0? field.getRange():schema.getCardinality();
             double sample = gd.sample();
-            //System.out.println("sample " + sample);
             result = (int)(( sample * result)%range);
             System.out.print(result+",");
         }
-        //System.out.print(result+",");
         return result;
     }
 

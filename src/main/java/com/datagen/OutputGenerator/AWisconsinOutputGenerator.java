@@ -21,9 +21,6 @@ import com.datagen.FieldGenerators.WisconsinGenerator;
 import com.datagen.FieldGenerators.WisconsinStringGenerator;
 import com.datagen.Schema.Schema;
 
-/**
- * Created by shiva on 3/10/18.
- */
 public abstract class AWisconsinOutputGenerator {
 
     private static final Logger LOGGER = LogManager.getRootLogger();
@@ -34,7 +31,7 @@ public abstract class AWisconsinOutputGenerator {
     private static long maxRecordLength;
     protected ExecutorService executorService;
     //A map from executor sequence id to a map for start and end row index
-    private Map<Integer, Pair<Integer, Integer>> executorsToStartAndEnd;
+    private Map<Integer, Pair<Long, Long>> executorsToStartAndEnd;
     private int numOfExecutors;
     private static final DecimalFormat decFormat = new DecimalFormat("#.######");
     //TODO: totalFileSize should be calculated from the record size to know the exact start and end row index(if the file size is deciding where we finish instead of number of records
@@ -50,7 +47,6 @@ public abstract class AWisconsinOutputGenerator {
         this.totalFileSize = 0;
         this.executorsToStartAndEnd = new HashMap<>();
         initiate();
-
     }
 
     private void initExecutors() {
@@ -58,11 +54,12 @@ public abstract class AWisconsinOutputGenerator {
     }
 
     private void initReaderToStartAndEnd() {
-        int length = schema.getCardinality() / numOfExecutors;
-        int start;
+        long length = schema.getCardinality() / numOfExecutors;
+        long start;
         for (int i = 0; i < numOfExecutors; i++) {
             start = length * i;
-            Pair<Integer, Integer> p = i == numOfExecutors - 1 ? new Pair<>(start, schema.getCardinality()): new Pair<>(start, start + length);
+            Pair<Long, Long> p = i == numOfExecutors - 1 ? new Pair<>(start, schema.getCardinality()):
+                    new Pair<>(start, start + length);
             executorsToStartAndEnd.put(i, p);
         }
     }
@@ -81,9 +78,11 @@ public abstract class AWisconsinOutputGenerator {
                 LOGGER.info("start index: " + executorsToStartAndEnd.get(readerId).getKey() + " end index: "
                         + executorsToStartAndEnd.get(readerId).getValue());
 
-                for (int id = executorsToStartAndEnd.get(readerId).getKey(); id <= executorsToStartAndEnd.get(readerId)
+                for (long id = executorsToStartAndEnd.get(readerId).getKey(); id <= executorsToStartAndEnd.get(readerId)
                         .getValue(); id++) {
-
+                    if (schema.getFileSize() > 0 && totalFileSize >= schema.getFileSize() * 1024 * 1024){
+                        break;
+                    }
                     if (id % batchSize == 0){
                         LOGGER.info("Thread "+ readerId +" Created " + id  + " records in "
                                 + Utils.getPrintableTimeDifference(startTime, System.currentTimeMillis()));
@@ -91,39 +90,37 @@ public abstract class AWisconsinOutputGenerator {
                     long currentRecordsize = 0;
                     String record = "{";
 
+                    boolean allFieldsNull= true;
                     for (int i = 0; i < schema.getFields().size(); i++) {
                         boolean comma = record.equalsIgnoreCase("{") ? false : true;
-                        Object nullOrMissing = generators.get(i).next(id);
-                        if ((nullOrMissing instanceof Long && (long) nullOrMissing == Long.MAX_VALUE)
-                                || (nullOrMissing instanceof String && ((String) nullOrMissing).isEmpty())) {
-                            continue;
-                        }
                         if (comma) {
                             record = record + ", ";
                         }
-                        if (nullOrMissing == null) {
-                            record = record + "\"" + schema.getFields().get(i).getName() + "\":" + null;
-                        } else {
-                            try {
-                                Object val = nullOrMissing;
-                                record = record + "\"" + schema.getFields().get(i).getName() + "\":";
-                                if (generators.get(i).getDataType() == DataType.BINARY) {
-                                    record = record + "hex(\"" + val + "\")";
-                                    currentRecordsize += ((String) val).length();
-                                } else if (generators.get(i).getDataType() == DataType.STRING) {
-                                    record = record + "\"" + val + "\"";
-                                    currentRecordsize += ((String) val).length();
-                                } else if (generators.get(i).getDataType() == DataType.INTEGER) {
-                                    record = record + val;
-                                    currentRecordsize += schema.getFields().get(i).getSizeInBytes(schema.getCardinality());
-                                }
-                            } catch (Exception e) {
-                                LOGGER.error(e);
-                            }
+                        Object val = generators.get(i).next(id);
+                        if (val == null) {
+                            LOGGER.warn("A null value was generated which is not supported currently. Skipped...");
+                            continue;
                         }
-
+                        try {
+                            allFieldsNull = false;
+                            record = record + "\"" + schema.getFields().get(i).getName() + "\":";
+                            if (generators.get(i).getDataType() == DataType.BINARY) {
+                                record = record + "hex(\"" + val + "\")";
+                                currentRecordsize += ((String) val).length();
+                            } else if (generators.get(i).getDataType() == DataType.STRING) {
+                                record = record + "\"" + val + "\"";
+                                currentRecordsize += ((String) val).length();
+                            } else if (generators.get(i).getDataType() == DataType.INTEGER) {
+                                record = record + val;
+                                currentRecordsize += schema.getFields().get(i).getSizeInBytes(schema.getCardinality());
+                            }
+                        } catch (Exception e) {
+                            LOGGER.error(e);
+                        }
                     }
                     record = record + "}\n";
+                    if (allFieldsNull)
+                        continue;
                     if (batchOfRecords.size() >= schema.getBatchSize()){
                         // Empty the batch
                         write(readerId, batchOfRecords, batchIndex);

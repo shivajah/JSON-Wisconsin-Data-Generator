@@ -8,26 +8,17 @@ import java.util.List;
  */
 public class Schema {
 
-    private String datasetName;
     private List<Field> fields;
-    private int cardinality;
+    private long cardinality;
     private String fileName;
     private int numOfPartitions;
     private long prime;
     private long generator;
     private long batchSize;
-    private int fileSize;
+    private long fileSize;
 
     public Schema(){
         this.fields = new LinkedList<Field>();
-    }
-
-    public String getDatasetName() {
-        return datasetName;
-    }
-
-    public void setDatasetName(String datasetName) {
-        this.datasetName = datasetName;
     }
 
     public List<Field> getFields() {
@@ -38,11 +29,11 @@ public class Schema {
         this.fields = fields;
     }
 
-    public int getCardinality() {
+    public long getCardinality() {
         return cardinality;
     }
 
-    public void setCardinality(int cardinality) { this.cardinality = cardinality; }
+    public void setCardinality(long cardinality) { this.cardinality = cardinality; }
 
     public String getFileName() {
         return fileName;
@@ -74,11 +65,11 @@ public class Schema {
 
     public void setGenerator(long generator) { this.generator = generator; }
 
-    public int getFileSize() {
+    public long getFileSize() {
         return fileSize;
     }
 
-    public void setFileSize(int fileSize) {
+    public void setFileSize(long fileSize) {
         this.fileSize = fileSize;
     }
 

@@ -4,6 +4,7 @@ import java.io.File;
 import java.io.IOException;
 import java.util.List;
 
+import com.datagen.Server;
 import org.apache.commons.io.FileUtils;
 
 public class StringWordList {
@@ -12,7 +13,7 @@ public class StringWordList {
     private static StringWordList instance;
 
     StringWordList() throws IOException {
-        wordList = FileUtils.readLines(new File("./configs/wordlist"), "utf-8");
+        wordList = FileUtils.readLines(new File(Server.workloadsFolder+"wordlist"), "utf-8");
     }
 
     public static StringWordList getInstance() throws IOException {

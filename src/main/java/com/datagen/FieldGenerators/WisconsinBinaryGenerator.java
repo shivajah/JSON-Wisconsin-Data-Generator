@@ -7,6 +7,7 @@ import com.datagen.Constants.DataTypes.DataType;
 import com.datagen.Constants.Order;
 import com.datagen.Schema.Field;
 import com.datagen.Schema.Schema;
+import com.datagen.Server;
 
 /**
  * Created by shiva on 3/7/18.
@@ -48,7 +49,7 @@ public class WisconsinBinaryGenerator extends WisconsinGenerator {
             return "";
         }
         if (f.getOrder() == Order.order.RANDOM) {
-            seed = rand(seed, schema.getCardinality());
+            seed = rand(seed, Long.valueOf(Server.couchbaseConfiguration.get(Server.CARDINALITY_NAME)));
         }
         if (f.getRange() > 0) {
             seed = seed % f.getRange();

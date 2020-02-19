@@ -4,6 +4,7 @@ import java.util.Random;
 
 import com.datagen.Constants.DataTypes.DataType;
 import com.datagen.Schema.Schema;
+import com.datagen.Server;
 
 /**
  * Created by shiva on 3/7/18.
@@ -49,11 +50,12 @@ public abstract class WisconsinGenerator {
     }
 
     private long nextNullOrMissing(int i, int numRemnullOrMissing) {
+        long cardinality = Long.valueOf(Server.couchbaseConfiguration.get(Server.CARDINALITY_NAME));
         if (numRemnullOrMissing <= 0) {
-            return schema.getCardinality() * 2;
+            return cardinality * 2;
         }
-        long max = schema.getCardinality() / numRemnullOrMissing;
-        if (i > max && max * 2 <= schema.getCardinality() - 1)
+        long max = cardinality / numRemnullOrMissing;
+        if (i > max && max * 2 <= cardinality- 1)
             max = max * 2;
         return rand.nextLong()/max + i;
     }

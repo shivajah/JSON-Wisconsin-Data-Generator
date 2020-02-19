@@ -1,8 +1,5 @@
 package com.datagen.Parser;
 
-/**
- * Created by shiva on 3/10/18.
- */
 public class PField {
     public String name;
     public String type;

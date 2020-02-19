@@ -8,39 +8,31 @@ import com.datagen.Constants.DataTypes;
 import com.datagen.Constants.Order;
 import com.datagen.Schema.Field;
 import com.datagen.Schema.Schema;
+import com.datagen.Server;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.core.type.TypeReference;
 
 public class Parser {
-    public List<Schema> parseWisconsinConfigFile(String configFile) throws Exception {
-        List<SchemaForParser> schemas = new LinkedList<>();
-        List<Schema> finalSchemas = new LinkedList<>();
+    public Schema parseWisconsinConfigFile(String configFile) throws Exception {
+        List<PField> fields = new LinkedList<>();
         ObjectMapper objectMapper = new ObjectMapper();
 
         File file = new File(configFile);
         try {
-            schemas = objectMapper.readValue(file, new TypeReference<List<SchemaForParser>>() {
+            fields = objectMapper.readValue(file, new TypeReference<List<PField>>() {
             });
         } catch (Exception e) {
             System.err.println(e.toString());
             e.printStackTrace();
         }
-        for (SchemaForParser sp : schemas) {
-            finalSchemas.add(generateSchema(sp));
-        }
-        return finalSchemas;
+
+        return generateSchema(fields);
     }
 
-    private Schema generateSchema(SchemaForParser sp) throws Exception {
-        Schema schema = new Schema();
+    private Schema generateSchema(List<PField> pfields) throws Exception {
         List<Field> fields = new LinkedList<>();
-        schema.setCardinality(sp.dataset.cardinality);
-        schema.setFileName(sp.file.name);
-        schema.setNumOfPartitions(sp.file.partitions);
-        schema.setFileSize(sp.dataset.fileSize);
-        schema.setBatchSize(sp.dataset.batchSize);
         Field field;
-        for (PField f : sp.fields) {
+        for (PField f : pfields) {
             field = new Field();
             field.setName(f.name);
             field.setDeclared(f.declared);
@@ -82,6 +74,7 @@ public class Parser {
             field.setType(dataType);
             fields.add(field);
         }
+        Schema schema = new Schema();
         schema.setFields(fields);
         setPrimeAndGenerator(schema);
         return schema;
@@ -89,7 +82,7 @@ public class Parser {
 
 
     private void setPrimeAndGenerator(Schema schema) {
-        long cardinality = schema.getCardinality();
+        long cardinality = Long.valueOf(Server.couchbaseConfiguration.get("cardinality"));
         long generator;
         long prime;
         if (cardinality <= Math.pow(10, 1)) {

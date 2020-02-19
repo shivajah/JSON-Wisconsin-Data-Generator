@@ -11,6 +11,7 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.IntStream;
 
+import com.datagen.Server;
 import org.apache.commons.math3.util.Pair;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -39,7 +40,7 @@ public abstract class AWisconsinOutputGenerator {
 
 
     public AWisconsinOutputGenerator(Schema schema, List<WisconsinGenerator> generators) {
-        this.numOfExecutors = schema.getNumOfPartitions();
+        this.numOfExecutors = Integer.valueOf(Server.couchbaseConfiguration.get(Server.PARTITIONS_NAME));
         this.schema = schema;
         this.generators = generators;
         this.threadToFileOutputStream = new HashMap<>();
@@ -48,19 +49,17 @@ public abstract class AWisconsinOutputGenerator {
         this.executorsToStartAndEnd = new HashMap<>();
     }
 
-    protected AWisconsinOutputGenerator() {
-    }
-
     private void initExecutors() {
         executorService = Executors.newFixedThreadPool(numOfExecutors);
     }
 
     private void initReaderToStartAndEnd() {
-        long length = schema.getCardinality() / numOfExecutors;
+        long cardinality =  Long.valueOf(Server.couchbaseConfiguration.get(Server.CARDINALITY_NAME));
+        long length = cardinality / numOfExecutors;
         long start;
         for (int i = 0; i < numOfExecutors; i++) {
             start = length * i;
-            Pair<Long, Long> p = i == numOfExecutors - 1 ? new Pair<>(start, schema.getCardinality()):
+            Pair<Long, Long> p = i == numOfExecutors - 1 ? new Pair<>(start, cardinality):
                     new Pair<>(start, start + length);
             executorsToStartAndEnd.put(i, p);
         }
@@ -70,7 +69,9 @@ public abstract class AWisconsinOutputGenerator {
         IntStream.range(0, numOfExecutors).forEach(readerId -> {
             executorService.submit(() -> {
                 int batchIndex = 0; // batch1, batch2,...
-                int batchSize = (int) schema.getBatchSize(); // Maximum number of records in a batch
+                int batchSize = Integer.valueOf(Server.couchbaseConfiguration.get(Server.BATCHSIZE_NAME)); // Maximum number of records in a batch
+                int fileSize = Integer.valueOf(Server.couchbaseConfiguration.get(Server.FILESIZE_NAME));
+                int cardinality = Integer.valueOf(Server.couchbaseConfiguration.get(Server.CARDINALITY_NAME));
                 int recordCount = 0;
                 long totalRecordLength = 0;
                 long minRecordLength = Long.MAX_VALUE;
@@ -82,7 +83,7 @@ public abstract class AWisconsinOutputGenerator {
 
                 for (long id = executorsToStartAndEnd.get(readerId).getKey(); id <= executorsToStartAndEnd.get(readerId)
                         .getValue(); id++) {
-                    if (schema.getFileSize() > 0 && totalFileSize >= schema.getFileSize() * 1024 * 1024){
+                    if (fileSize > 0 && totalFileSize >= fileSize * 1024 * 1024){
                         break;
                     }
                     if (id % batchSize == 0){
@@ -114,7 +115,7 @@ public abstract class AWisconsinOutputGenerator {
                                 currentRecordsize += ((String) val).length();
                             } else if (generators.get(i).getDataType() == DataType.INTEGER) {
                                 record = record + val;
-                                currentRecordsize += schema.getFields().get(i).getSizeInBytes(schema.getCardinality());
+                                currentRecordsize += schema.getFields().get(i).getSizeInBytes(cardinality);
                             }
                         } catch (Exception e) {
                             LOGGER.error(e);
@@ -123,7 +124,7 @@ public abstract class AWisconsinOutputGenerator {
                     record = record + "}\n";
                     if (allFieldsNull)
                         continue;
-                    if (batchOfRecords.size() >= schema.getBatchSize()){
+                    if (batchOfRecords.size() >= batchSize){
                         // Empty the batch
                         write(readerId, batchOfRecords, batchIndex);
                         batchIndex++;

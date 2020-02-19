@@ -4,6 +4,7 @@ import com.datagen.Constants.DataTypes.DataType;
 import com.datagen.Constants.Order;
 import com.datagen.Schema.Field;
 import com.datagen.Schema.Schema;
+import com.datagen.Server;
 import org.apache.commons.math3.distribution.GammaDistribution;
 
 public class WisconsinNumberGenerator extends WisconsinGenerator {
@@ -19,9 +20,10 @@ public class WisconsinNumberGenerator extends WisconsinGenerator {
     @Override
     public Object next(long seed) {
         long result;
+        long cardinality = Long.valueOf(Server.couchbaseConfiguration.get(Server.CARDINALITY_NAME));
         // Use cardinality and Jim Gray's algo
         if (field.getOrder() == Order.order.RANDOM)
-            result = rand(seed, schema.getCardinality());
+            result = rand(seed, cardinality);
         else
             result = seed;
         if (field.getRange() > 0) {
@@ -36,7 +38,7 @@ public class WisconsinNumberGenerator extends WisconsinGenerator {
 
         if (!field.isNormalDistribution()) {
 
-            long range = field.getRange() > 0? field.getRange():schema.getCardinality();
+            long range = field.getRange() > 0? field.getRange():cardinality;
             double sample = gd.sample();
             result = (int)(( sample * result)%range);
             System.out.print(result+",");

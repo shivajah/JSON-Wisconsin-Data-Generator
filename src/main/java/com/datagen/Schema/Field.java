@@ -7,7 +7,6 @@ import com.datagen.Constants.Order;
  * Created by shiva on 3/1/18.
  */
 public class Field {
-    private Schema schema;
     private DataTypes.DataType type;
     private String name;
     private boolean declared;

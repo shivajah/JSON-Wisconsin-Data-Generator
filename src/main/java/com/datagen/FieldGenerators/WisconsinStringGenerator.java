@@ -9,6 +9,7 @@ import java.util.Random;
 import java.util.Set;
 import java.util.Stack;
 
+import com.datagen.Server;
 import org.apache.commons.math3.distribution.GammaDistribution;
 
 import com.datagen.Constants.DataTypes.DataType;
@@ -63,7 +64,7 @@ public class WisconsinStringGenerator extends WisconsinGenerator {
 
     public String next(long seed) {
         if (f.getOrder() == Order.order.RANDOM) {
-            seed = rand(seed, schema.getCardinality());
+            seed = rand(seed, Long.valueOf(Server.couchbaseConfiguration.get(Server.CARDINALITY_NAME)));
         }
         if (f.getRange() > 0) {
             seed = seed % f.getRange();

@@ -2,6 +2,7 @@ package com.datagen.OutputGenerator;
 
 import com.datagen.FieldGenerators.WisconsinGenerator;
 import com.datagen.Schema.Schema;
+import com.datagen.Server;
 
 import java.io.BufferedOutputStream;
 import java.io.File;
@@ -41,10 +42,10 @@ public class WisconsinFileOutputGenerator extends AWisconsinOutputGenerator {
     public void initiate() {
         super.initiate();
         //TODO: use schema file name for this purpose
-        String filePrefix = schema.getFileName().split(".adm")[0];
+        String filePrefix = Server.couchbaseConfiguration.get(Server.FILEOUTPUT_NAME).split(".adm")[0];
         final String fileName = (filePrefix != null) ? directory + filePrefix : directory + "tempFile";
         File f = new File(fileName);
-        IntStream.range(0, schema.getNumOfPartitions()).forEach(readerId -> {
+        IntStream.range(0, Integer.valueOf(Server.couchbaseConfiguration.get(Server.PARTITIONS_NAME))).forEach(readerId -> {
             String execFilename = fileName + "p_" + readerId + ".adm";
             File execFile = new File(execFilename);
             try {

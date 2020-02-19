@@ -25,11 +25,13 @@ import java.util.Map;
 
 public class Server {
 
-    private static final Logger LOGGER = LogManager.getRootLogger();
-    public static final String workloadsFolder = "src/main/java/com/datagen/Workloads/";
-    public static void main(String[] args) throws Exception {
+    private static Map<String, String> env = System.getenv();
+    private static String DATAGEN_HOME = env.get("DATAGEN_HOME");
+    public static String workloadsFolder = DATAGEN_HOME+"/Workloads/";
 
+    public static void main(String[] args) throws Exception {
         Map<String, String> commandLineCfg = processCommandLineConfig(args);
+
         String workload = workloadsFolder + (commandLineCfg.containsKey("workload")? commandLineCfg.get("workload"):
                 "wisconsin_1GB_std_zero_fixedLength_noBigObject.json");
 

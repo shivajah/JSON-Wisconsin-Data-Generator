@@ -6,4 +6,4 @@ then
 	exit 1
 fi
 
-java -cp ${DATAGEN_HOME}/target/datagen-driver-jar-with-dependencies.jar com.datagen.Server ${DATAGEN_HOME} $@
+java -cp ${DATAGEN_HOME}/target/datagen-driver-jar-with-dependencies.jar com.datagen.Server $@

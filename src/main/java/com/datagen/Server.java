@@ -19,10 +19,6 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
-/**
- * Created by shiva on 2/21/18.
- */
-
 public class Server {
 
     private static Map<String, String> env = System.getenv();
@@ -58,12 +54,13 @@ public class Server {
             }
 
             // Default outputwriter is filewriter.
-            AWisconsinOutputGenerator outputGenerators = new WisconsinFileOutputGenerator(schema, generators);
-            if (commandLineCfg.containsKey("writer")) {
+            AWisconsinOutputGenerator outputGenerators = null;
                 String writer = commandLineCfg.get("writer");
-                if (writer.equalsIgnoreCase("couchbase")) {
+                if (writer != null && writer.equalsIgnoreCase("couchbase")) {
                     outputGenerators = new WisconsinCouchbaseLoadOutputGenerator(schema, generators, commandLineCfg);
                 }
+            else {
+                outputGenerators = new WisconsinFileOutputGenerator(schema, generators);
             }
             outputGenerators.execute();
         }

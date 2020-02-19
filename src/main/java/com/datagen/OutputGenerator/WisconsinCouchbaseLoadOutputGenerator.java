@@ -40,15 +40,9 @@ public class WisconsinCouchbaseLoadOutputGenerator extends AWisconsinOutputGener
     private static final int PORT_DEFAULT = -9999; // Let the SDK use its own default if not provided
     private static final String USER_NAME_DEFAULT = "Administrator";
     private static final String PASSWORD_DEFAULT = "pass123";
-    private static final String BUCKET_NAME_DEFAULT = "Test";
-    private static final boolean IS_DELETE_BUCKET_IF_EXISTS_DEFAULT = true;
-    private static final int MEMORY_QUOTA_DEFAULT = 4096; // In megabytes
+    private static final String BUCKET_NAME_DEFAULT = "sample";
 
     // Configurable members default values
-    private static final int BATCH_LIMIT_DEFAULT = 10000; // Threshold to reach before batch upserting
-    private static final double SCALE_FACTOR_DEFAULT = 1;
-    private static final int PARTITIONS_DEFAULT = 2;
-    private static final int PARTITION_DEFAULT = -1;
     private static final int KV_ENDPOINTS_DEFAULT = 5; // improves the pipelining for better performance
     private static final int KV_TIMEOUT_DEFAULT = 30000;
     private static final int FAILURE_RETRY_DELAY_DEFAULT = 5000;
@@ -60,11 +54,6 @@ public class WisconsinCouchbaseLoadOutputGenerator extends AWisconsinOutputGener
     private static final String USER_NAME_FIELD_NAME = "username";
     private static final String PASSWORD_FIELD_NAME = "password";
     private static final String BUCKET_NAME_FIELD_NAME = "bucketname";
-    private static final String IS_DELETE_IF_BUCKET_EXISTS_FIELD_NAME = "isdeleteifbucketexists";
-    private static final String MEMORY_QUOTA_FIELD_NAME = "memoryquota";
-    private static final String BATCH_LIMIT_FIELD_NAME = "batchlimit";
-    private static final String PARTITIONS_FIELD_NAME = "partitions";
-    private static final String PARTITION_FIELD_NAME = "partition";
     private static final String KV_ENDPOINTS_FIELD_NAME = "kvendpoints";
     private static final String KV_TIMEOUT_FIELD_NAME = "kvtimeout";
     private static final String FAILURE_RETRY_DELAY_FIELD_NAME = "failureretrydelay";
@@ -77,11 +66,6 @@ public class WisconsinCouchbaseLoadOutputGenerator extends AWisconsinOutputGener
         couchbaseConfiguration.put(USER_NAME_FIELD_NAME, USER_NAME_DEFAULT);
         couchbaseConfiguration.put(PASSWORD_FIELD_NAME, PASSWORD_DEFAULT);
         couchbaseConfiguration.put(BUCKET_NAME_FIELD_NAME, BUCKET_NAME_DEFAULT);
-        couchbaseConfiguration.put(IS_DELETE_IF_BUCKET_EXISTS_FIELD_NAME, String.valueOf(IS_DELETE_BUCKET_IF_EXISTS_DEFAULT));
-        couchbaseConfiguration.put(MEMORY_QUOTA_FIELD_NAME, String.valueOf(MEMORY_QUOTA_DEFAULT));
-        couchbaseConfiguration.put(BATCH_LIMIT_FIELD_NAME, String.valueOf(BATCH_LIMIT_DEFAULT));
-        couchbaseConfiguration.put(PARTITIONS_FIELD_NAME, String.valueOf(PARTITIONS_DEFAULT));
-        couchbaseConfiguration.put(PARTITION_FIELD_NAME, String.valueOf(PARTITION_DEFAULT));
         couchbaseConfiguration.put(KV_ENDPOINTS_FIELD_NAME, String.valueOf(KV_ENDPOINTS_DEFAULT));
         couchbaseConfiguration.put(KV_TIMEOUT_FIELD_NAME, String.valueOf(KV_TIMEOUT_DEFAULT));
         couchbaseConfiguration.put(FAILURE_RETRY_DELAY_FIELD_NAME, String.valueOf(FAILURE_RETRY_DELAY_DEFAULT));
@@ -105,8 +89,6 @@ public class WisconsinCouchbaseLoadOutputGenerator extends AWisconsinOutputGener
 
     private static void processAndSetConfiguration(Map<String, String> cmdlineConfig) {
         // Command line configurations
-
-
         String propertiesFilePath = null;
 
         // Get the properties file if it was provided in command line arguments
@@ -123,27 +105,6 @@ public class WisconsinCouchbaseLoadOutputGenerator extends AWisconsinOutputGener
         // Make sure the command line configs override the properties file configs
         couchbaseConfiguration.putAll(propertiesFileConfig);
         couchbaseConfiguration.putAll(cmdlineConfig);
-    }
-
-    /**
-     * Reads the configuration passed in the command line
-     *
-     * @param arguments command line arguments
-     * @return a map containing the read configuration
-     */
-    private static Map<String, String> readCommandLineConfiguration(String[] arguments) {
-        Map<String, String> configs = new HashMap<>();
-
-        // Arguments from command line
-        if (arguments != null && arguments.length > 0) {
-            for (String arg : arguments) {
-                if (arg.contains("=")) {
-                    configs.put(arg.substring(0, arg.indexOf('=')).toLowerCase(), arg.substring(arg.indexOf('=') + 1));
-                }
-            }
-        }
-
-        return configs;
     }
 
     /**
@@ -238,10 +199,9 @@ public class WisconsinCouchbaseLoadOutputGenerator extends AWisconsinOutputGener
 
 
     private void setUpBucketConfiguration(Bucket bucket) {
-        int batchLimit = Integer.valueOf(couchbaseConfiguration.get(BATCH_LIMIT_FIELD_NAME));
         int failureRetryDelay = Integer.valueOf(couchbaseConfiguration.get(FAILURE_RETRY_DELAY_FIELD_NAME));
         int failureMaximumRetries = Integer.valueOf(couchbaseConfiguration.get(FAILURE_MAXIMUM_RETRIES_FIELD_NAME));
-        bucketConfiguration = new BucketConfiguration(bucket, batchLimit, failureRetryDelay, failureMaximumRetries);
+        bucketConfiguration = new BucketConfiguration(bucket, failureRetryDelay, failureMaximumRetries);
     }
 
 

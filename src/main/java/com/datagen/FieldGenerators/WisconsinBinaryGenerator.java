@@ -70,34 +70,7 @@ public class WisconsinBinaryGenerator extends WisconsinGenerator {
             index++;
         }
 
-        //        char[] field = { 'A', 'A', 'A', 'A', 'A', 'A', 'A' };
-        //        if (seed == 0) {
-        //            long rem = seed % 26;
-        //            temp.push((char) ('A' + rem));
-        //        }
-        //        while (seed > 0) {
-        //            long rem = seed % 26;
-        //            temp.push((char) ('A' + rem));
-        //            seed = seed / 26;
-        //        }
-        //        int i = 0;
-        //        while (!temp.empty() && i < field.length) {
-        //            field[i] = temp.pop();
-        //            i++;
-        //        }
-        //        return addPaddingX(String.valueOf(field));
-
         return String.valueOf(returnCharValues);
 
     }
-
-    //    private String addPaddingX(String value) {
-    //        int stLen = schema.getFields().get(fieldId).getStringLength();
-    //        int diff = stLen - value.length();
-    //        for (int i = 0; i < diff; i++) {
-    //            value = value + 'X';
-    //        }
-    //        return value;
-    //    }
-
 }

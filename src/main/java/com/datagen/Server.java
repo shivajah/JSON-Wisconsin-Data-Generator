@@ -60,7 +60,7 @@ public class Server {
             if (commandLineCfg.containsKey("writer")) {
                 String writer = commandLineCfg.get("writer");
                 if (writer.equalsIgnoreCase("couchbase")) {
-                    outputGenerators = new WisconsinCouchbaseLoadOutputGenerator(schema, generators);
+                    outputGenerators = new WisconsinCouchbaseLoadOutputGenerator(schema, generators, commandLineCfg);
                 }
             }
             outputGenerators.execute();

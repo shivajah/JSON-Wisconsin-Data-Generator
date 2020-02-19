@@ -14,6 +14,7 @@ public class WisconsinFileOutputGenerator extends AWisconsinOutputGenerator {
 
     public WisconsinFileOutputGenerator(Schema schema, List<WisconsinGenerator> generators) {
         super(schema, generators);
+        initiate();
     }
 
     @Override

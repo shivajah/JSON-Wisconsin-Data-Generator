@@ -46,7 +46,9 @@ public abstract class AWisconsinOutputGenerator {
         this.maxRecordLength = 0;
         this.totalFileSize = 0;
         this.executorsToStartAndEnd = new HashMap<>();
-        initiate();
+    }
+
+    protected AWisconsinOutputGenerator() {
     }
 
     private void initExecutors() {

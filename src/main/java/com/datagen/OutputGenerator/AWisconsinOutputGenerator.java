@@ -33,14 +33,16 @@ public abstract class AWisconsinOutputGenerator {
     protected ExecutorService executorService;
     //A map from executor sequence id to a map for start and end row index
     private Map<Integer, Pair<Long, Long>> executorsToStartAndEnd;
-    private int numOfExecutors;
+    private int partitions;
+    private int partition;
     private static final DecimalFormat decFormat = new DecimalFormat("#.######");
     //TODO: totalFileSize should be calculated from the record size to know the exact start and end row index(if the file size is deciding where we finish instead of number of records
     public double totalFileSize;
 
 
     public AWisconsinOutputGenerator(Schema schema, List<WisconsinGenerator> generators) {
-        this.numOfExecutors = Integer.valueOf(Server.couchbaseConfiguration.get(Server.PARTITIONS_NAME));
+        this.partitions = Integer.valueOf(Server.couchbaseConfiguration.get(Server.PARTITIONS_NAME));
+        this.partition = Integer.valueOf(Server.couchbaseConfiguration.get(Server.PARTITION_NAME));
         this.schema = schema;
         this.generators = generators;
         this.threadToFileOutputStream = new HashMap<>();
@@ -50,117 +52,130 @@ public abstract class AWisconsinOutputGenerator {
     }
 
     private void initExecutors() {
-        executorService = Executors.newFixedThreadPool(numOfExecutors);
+        // if partition == -1, then all partitions should get created (in parallel)
+        if (partition < 0) {
+            executorService = Executors.newFixedThreadPool(partitions);
+        } else { // Otherwise, only the mentioned partition will be generated using one thread
+            executorService = Executors.newFixedThreadPool(1);
+        }
     }
 
     private void initReaderToStartAndEnd() {
         long cardinality =  Long.valueOf(Server.couchbaseConfiguration.get(Server.CARDINALITY_NAME));
-        long length = cardinality / numOfExecutors;
+        long length = cardinality / partitions;
         long start;
-        for (int i = 0; i < numOfExecutors; i++) {
+        for (int i = 0; i < partitions; i++) {
             start = length * i;
-            Pair<Long, Long> p = i == numOfExecutors - 1 ? new Pair<>(start, cardinality):
+            Pair<Long, Long> p = i == partitions - 1 ? new Pair<>(start, cardinality):
                     new Pair<>(start, start + length);
             executorsToStartAndEnd.put(i, p);
         }
     }
 
     public void execute() {
-        IntStream.range(0, numOfExecutors).forEach(readerId -> {
-            executorService.submit(() -> {
-                int batchIndex = 0; // batch1, batch2,...
-                int batchSize = Integer.valueOf(Server.couchbaseConfiguration.get(Server.BATCHSIZE_NAME)); // Maximum number of records in a batch
-                int fileSize = Integer.valueOf(Server.couchbaseConfiguration.get(Server.FILESIZE_NAME));
-                int cardinality = Integer.valueOf(Server.couchbaseConfiguration.get(Server.CARDINALITY_NAME));
-                int recordCount = 0;
-                long totalRecordLength = 0;
-                long minRecordLength = Long.MAX_VALUE;
-                long startTime = System.currentTimeMillis();
-                List<String> batchOfRecords = new LinkedList<>();
-
-                LOGGER.info("start index: " + executorsToStartAndEnd.get(readerId).getKey() + " end index: "
-                        + executorsToStartAndEnd.get(readerId).getValue());
-
-                for (long id = executorsToStartAndEnd.get(readerId).getKey(); id <= executorsToStartAndEnd.get(readerId)
-                        .getValue(); id++) {
-                    if (fileSize > 0 && totalFileSize >= fileSize * 1024 * 1024){
-                        break;
-                    }
-                    if (id % batchSize == 0){
-                        LOGGER.info("Thread "+ readerId +" Created " + id  + " records in "
-                                + Utils.getPrintableTimeDifference(startTime, System.currentTimeMillis()));
-                    }
-                    long currentRecordsize = 0;
-                    String record = "{";
-
-                    boolean allFieldsNull= true;
-                    for (int i = 0; i < schema.getFields().size(); i++) {
-                        boolean comma = record.equalsIgnoreCase("{") ? false : true;
-                        if (comma) {
-                            record = record + ", ";
-                        }
-                        Object val = generators.get(i).next(id);
-                        if (val == null) {
-                            LOGGER.warn("A null value was generated which is not supported currently. Skipped...");
-                            continue;
-                        }
-                        try {
-                            allFieldsNull = false;
-                            record = record + "\"" + schema.getFields().get(i).getName() + "\":";
-                            if (generators.get(i).getDataType() == DataType.BINARY) {
-                                record = record + "hex(\"" + val + "\")";
-                                currentRecordsize += ((String) val).length();
-                            } else if (generators.get(i).getDataType() == DataType.STRING) {
-                                record = record + "\"" + val + "\"";
-                                currentRecordsize += ((String) val).length();
-                            } else if (generators.get(i).getDataType() == DataType.INTEGER) {
-                                record = record + val;
-                                currentRecordsize += schema.getFields().get(i).getSizeInBytes(cardinality);
-                            }
-                        } catch (Exception e) {
-                            LOGGER.error(e);
-                        }
-                    }
-                    record = record + "}\n";
-                    if (allFieldsNull)
-                        continue;
-                    if (batchOfRecords.size() >= batchSize){
-                        // Empty the batch
-                        write(readerId, batchOfRecords, batchIndex);
-                        batchIndex++;
-                        batchOfRecords.clear();
-                    }
-                    batchOfRecords.add(record);
-
-                    totalFileSize += currentRecordsize;
-                    if (currentRecordsize > maxRecordLength) {
-                        maxRecordLength = currentRecordsize;
-                    } else if (currentRecordsize < minRecordLength) {
-                        minRecordLength = currentRecordsize;
-                    }
-                    totalRecordLength += currentRecordsize;
-                    recordCount++;
-                }
-                if (batchOfRecords.size() > 0) {
-                    write(readerId, batchOfRecords, batchIndex);
-                }
-                closeWriter(readerId);
-
-                // Stats info logging
-                LOGGER.info("Thread "+ readerId +" Processed " + recordCount + " in " + Utils.getPrintableTimeDifference(startTime, System.currentTimeMillis()));
-                LOGGER.info(
-                        "Record Generation Done. recordCount: " + recordCount + " minRecordLength: " + minRecordLength
-                                + " maxRecordLength: " + maxRecordLength + " totalRecordLength: " + totalRecordLength+
-                                " totalFileSize: "+ (totalFileSize/(double)1024/(double)1024)+" (MB)"+
-                                 " avg record length: " + decFormat.format((double) totalRecordLength / recordCount));
-
-                // Calculate and print string length on average
-                LOGGER.info(printStringLengthInfo());
+        if (partition < 0) { // All partitions
+            IntStream.range(0, partitions).forEach(readerId -> {
+                executorService.submit(() -> {
+                    executorTask(readerId);
+                });
             });
-        });
-        shutDownExecutors();
+        } else { //only one partition
+            executorService.submit(()->executorTask(partition));
+        }
+            shutDownExecutors();
+
     }
 
+    private void executorTask(int readerId) {
+        int batchIndex = 0; // batch1, batch2,...
+        int batchSize = Integer.valueOf(Server.couchbaseConfiguration.get(Server.BATCHSIZE_NAME)); // Maximum number of records in a batch
+        int fileSize = Integer.valueOf(Server.couchbaseConfiguration.get(Server.FILESIZE_NAME));
+        int cardinality = Integer.valueOf(Server.couchbaseConfiguration.get(Server.CARDINALITY_NAME));
+        int recordCount = 0;
+        long totalRecordLength = 0;
+        long minRecordLength = Long.MAX_VALUE;
+        long startTime = System.currentTimeMillis();
+        List<String> batchOfRecords = new LinkedList<>();
+
+        LOGGER.info("start index: " + executorsToStartAndEnd.get(readerId).getKey() + " end index: "
+                + executorsToStartAndEnd.get(readerId).getValue());
+
+        for (long id = executorsToStartAndEnd.get(readerId).getKey(); id <= executorsToStartAndEnd.get(readerId)
+                .getValue(); id++) {
+            if (fileSize > 0 && totalFileSize >= fileSize * 1024 * 1024){
+                break;
+            }
+            if (id % batchSize == 0){
+                LOGGER.info("Thread "+ readerId +" Created " + id  + " records in "
+                        + Utils.getPrintableTimeDifference(startTime, System.currentTimeMillis()));
+            }
+            long currentRecordsize = 0;
+            String record = "{";
+
+            boolean allFieldsNull= true;
+            for (int i = 0; i < schema.getFields().size(); i++) {
+                boolean comma = record.equalsIgnoreCase("{") ? false : true;
+                if (comma) {
+                    record = record + ", ";
+                }
+                Object val = generators.get(i).next(id);
+                if (val == null) {
+                    LOGGER.warn("A null value was generated which is not supported currently. Skipped...");
+                    continue;
+                }
+                try {
+                    allFieldsNull = false;
+                    record = record + "\"" + schema.getFields().get(i).getName() + "\":";
+                    if (generators.get(i).getDataType() == DataType.BINARY) {
+                        record = record + "hex(\"" + val + "\")";
+                        currentRecordsize += ((String) val).length();
+                    } else if (generators.get(i).getDataType() == DataType.STRING) {
+                        record = record + "\"" + val + "\"";
+                        currentRecordsize += ((String) val).length();
+                    } else if (generators.get(i).getDataType() == DataType.INTEGER) {
+                        record = record + val;
+                        currentRecordsize += schema.getFields().get(i).getSizeInBytes(cardinality);
+                    }
+                } catch (Exception e) {
+                    LOGGER.error(e);
+                }
+            }
+            record = record + "}\n";
+            if (allFieldsNull)
+                continue;
+            if (batchOfRecords.size() >= batchSize){
+                // Empty the batch
+                write(readerId, batchOfRecords, batchIndex);
+                batchIndex++;
+                batchOfRecords.clear();
+            }
+            batchOfRecords.add(record);
+
+            totalFileSize += currentRecordsize;
+            if (currentRecordsize > maxRecordLength) {
+                maxRecordLength = currentRecordsize;
+            } else if (currentRecordsize < minRecordLength) {
+                minRecordLength = currentRecordsize;
+            }
+            totalRecordLength += currentRecordsize;
+            recordCount++;
+        }
+        if (batchOfRecords.size() > 0) {
+            write(readerId, batchOfRecords, batchIndex);
+        }
+        closeWriter(readerId);
+
+        // Stats info logging
+        LOGGER.info("Thread "+ readerId +" Processed " + recordCount + " in " + Utils.getPrintableTimeDifference(startTime, System.currentTimeMillis()));
+        LOGGER.info(
+                "Record Generation Done. recordCount: " + recordCount + " minRecordLength: " + minRecordLength
+                        + " maxRecordLength: " + maxRecordLength + " totalRecordLength: " + totalRecordLength+
+                        " totalFileSize: "+ (totalFileSize/(double)1024/(double)1024)+" (MB)"+
+                        " avg record length: " + decFormat.format((double) totalRecordLength / recordCount));
+
+        // Calculate and print string length on average
+        LOGGER.info(printStringLengthInfo());
+    }
     private void shutDownExecutors() {
         try {
             executorService.shutdown();

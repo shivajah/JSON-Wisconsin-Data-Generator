@@ -38,12 +38,13 @@ public class Server {
     private static final String BUCKET_NAME_DEFAULT = "sample";
 
     // Dataset default values
-    private static final String WORKLOAD_NAME_DEFUALT = "wisconsin_1GB_std_zero_fixedLength_noBigObject.json";
+    private static final String WORKLOAD_NAME_DEFUALT = "wisconsin_1GB_std_zero_fixedLength_noBigObject_3kbEachRecord.json";
     private static final int FILESIZE_DEAFULT = -1; // If <0 program finishes when cardinality is reached, otherwise faster_reached(filesize,cardinality) will br the terminator of the program.
     private static final int BATCHSIZE_DEFAULT = 1000;
     private static final int PARTITIONS_DEFAULT = 1;
+    private static final int PARTITION_DEFAULT = -1;
     private static final String FILEOUTPUT_NAME_DEFAULT = "output.adm";
-    private static final long CARDINALITY_DEFAULT = 1000;
+    private static final long CARDINALITY_DEFAULT = 999;
     private static final String WRITER_NAME_DEFAULT = "file";
 
     // Configurable members default values
@@ -71,6 +72,7 @@ public class Server {
     public static final String CARDINALITY_NAME = "cardinality";
     public static final String BATCHSIZE_NAME = "batchsize";
     public static final String PARTITIONS_NAME = "partitions";
+    public static final String PARTITION_NAME = "partition";
     public static final String FILEOUTPUT_NAME = "fileoutput";
     public static final String WRITER_NAME = "writer";
 
@@ -91,9 +93,10 @@ public class Server {
         couchbaseConfiguration.put(FILESIZE_NAME, String.valueOf(FILESIZE_DEAFULT));
         couchbaseConfiguration.put(BATCHSIZE_NAME, String.valueOf(BATCHSIZE_DEFAULT));
         couchbaseConfiguration.put(PARTITIONS_NAME, String.valueOf(PARTITIONS_DEFAULT));
+        couchbaseConfiguration.put(PARTITION_NAME, String.valueOf(PARTITION_DEFAULT));
         couchbaseConfiguration.put(FILEOUTPUT_NAME, FILEOUTPUT_NAME_DEFAULT);
         couchbaseConfiguration.put(CARDINALITY_NAME, String.valueOf(CARDINALITY_DEFAULT));
-        couchbaseConfiguration.put(WRITER_NAME, WORKLOAD_NAME_DEFUALT);
+        couchbaseConfiguration.put(WRITER_NAME, WRITER_NAME_DEFAULT);
     }
 
 
@@ -101,8 +104,8 @@ public class Server {
         Map<String, String> commandLineCfg = processCommandLineConfig(args);
         processAndSetConfiguration(commandLineCfg);
 
-        String workload = workloadsFolder + (commandLineCfg.containsKey("workload")? commandLineCfg.get("workload"):
-                "wisconsin_1GB_std_zero_fixedLength_noBigObject.json");
+        String workload = workloadsFolder + (couchbaseConfiguration.containsKey("workload")? couchbaseConfiguration.get("workload"):
+                "wisconsin_1GB_std_zero_fixedLength_noBigObject_1p23kbEachRecord.json");
 
         Parser parser = new Parser();
         Schema schema = parser.parseWisconsinConfigFile(workload);

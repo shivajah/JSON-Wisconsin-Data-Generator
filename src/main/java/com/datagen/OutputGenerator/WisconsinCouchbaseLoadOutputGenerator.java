@@ -105,7 +105,7 @@ public class WisconsinCouchbaseLoadOutputGenerator extends AWisconsinOutputGener
 
         for (int i = 0; i < batchOfRecords.size(); i++) {
               JsonObject jsonObject = JsonObject.fromJson(batchOfRecords.get(i));
-                jsonDocuments.add(JsonDocument.create(threadId+ "_" + batchIndex + "_" + i, jsonObject));
+                jsonDocuments.add(JsonDocument.create(jsonObject.get("unique2").toString(), jsonObject));
         }
         Observable.from(jsonDocuments).flatMap(
                 (final JsonDocument docToInsert) -> bucketConfiguration.getBucket().async().upsert(docToInsert)

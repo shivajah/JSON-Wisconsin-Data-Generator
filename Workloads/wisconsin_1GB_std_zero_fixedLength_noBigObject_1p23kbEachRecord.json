@@ -212,7 +212,7 @@
       "name":"string4",
       "type":"string",
       "length":"787",
-      "range":4,
+      "range": 4,
       "order":"random",
       "declared":true,
       "optional":false,

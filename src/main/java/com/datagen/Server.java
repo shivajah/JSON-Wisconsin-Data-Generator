@@ -1,3 +1,26 @@
+/*
+ * Copyright 2019 Couchbase, Inc.
+ */
+/*Copyright (c) 2020 Shiva Jahangiri
+
+        Permission is hereby granted, free of charge, to any person obtaining a copy
+        of this software and associated documentation files (the "Software"), to deal
+        in the Software without restriction, including without limitation the rights
+        to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+        copies of the Software, and to permit persons to whom the Software is
+        furnished to do so, subject to the following conditions:
+
+        The above copyright notice and this permission notice shall be included in all
+        copies or substantial portions of the Software.
+
+        THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+        IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+        FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+        AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+        LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+        OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+        SOFTWARE.
+*/
 package com.datagen;
 
 import com.datagen.Constants.DataTypes;
@@ -6,6 +29,7 @@ import com.datagen.FieldGenerators.WisconsinGenerator;
 import com.datagen.FieldGenerators.WisconsinNumberGenerator;
 import com.datagen.FieldGenerators.WisconsinStringGenerator;
 import com.datagen.OutputGenerator.AWisconsinOutputGenerator;
+import com.datagen.OutputGenerator.WisconsinAsterixDBLoadOutputGenerator;
 import com.datagen.OutputGenerator.WisconsinCouchbaseLoadOutputGenerator;
 import com.datagen.OutputGenerator.WisconsinFileOutputGenerator;
 import com.datagen.Parser.Parser;
@@ -23,7 +47,8 @@ import java.util.*;
 public class Server {
 
     private static Map<String, String> env = System.getenv();
-    private static String DATAGEN_HOME = env.get("DATAGEN_HOME");
+    private static String DATAGEN_HOME = env.get("DATAGEN_HOME") == null ? "/Users/shiva/workspace/datagen_afterCB/":env.get(
+            "DATAGEN_HOME");
     public static String workloadsFolder = DATAGEN_HOME+"/Workloads/";
     private static final Logger LOGGER = LogManager.getRootLogger();
 
@@ -46,6 +71,7 @@ public class Server {
     private static final String FILEOUTPUT_NAME_DEFAULT = "output.adm";
     private static final long CARDINALITY_DEFAULT = 999;
     private static final String WRITER_NAME_DEFAULT = "file";
+    private static final int ASTERIXDB_LOAD_PORT_DEFAULT=10001;
 
     // Configurable members default values
     private static final int KV_ENDPOINTS_DEFAULT = 5; // improves the pipelining for better performance
@@ -75,6 +101,7 @@ public class Server {
     public static final String PARTITION_NAME = "partition";
     public static final String FILEOUTPUT_NAME = "fileoutput";
     public static final String WRITER_NAME = "writer";
+    public static final String ASTERIXDB_LOAD_PORT="AsterixDBLoadPort";
 
 
     static {
@@ -97,6 +124,7 @@ public class Server {
         couchbaseConfiguration.put(FILEOUTPUT_NAME, FILEOUTPUT_NAME_DEFAULT);
         couchbaseConfiguration.put(CARDINALITY_NAME, String.valueOf(CARDINALITY_DEFAULT));
         couchbaseConfiguration.put(WRITER_NAME, WRITER_NAME_DEFAULT);
+        couchbaseConfiguration.put(ASTERIXDB_LOAD_PORT, String.valueOf(ASTERIXDB_LOAD_PORT_DEFAULT));
     }
 
 
@@ -130,13 +158,16 @@ public class Server {
 
         // Default outputwriter is filewriter.
         AWisconsinOutputGenerator outputGenerators = null;
-            String writer = commandLineCfg.get("writer");
+            String writer = couchbaseConfiguration.get("writer");
             if (writer != null && writer.equalsIgnoreCase("couchbase")) {
                 outputGenerators = new WisconsinCouchbaseLoadOutputGenerator(schema, generators);
             }
-        else {
-            outputGenerators = new WisconsinFileOutputGenerator(schema, generators);
-        }
+            else if (writer != null && writer.equalsIgnoreCase("asterixdb")){
+                outputGenerators = new WisconsinAsterixDBLoadOutputGenerator(schema, generators);
+            }
+            else {
+                outputGenerators = new WisconsinFileOutputGenerator(schema, generators);
+            }
         outputGenerators.execute();
     }
 

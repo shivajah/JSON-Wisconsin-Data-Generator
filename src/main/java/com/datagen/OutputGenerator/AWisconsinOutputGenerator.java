@@ -1,7 +1,28 @@
+/*Copyright (c) 2020 Shiva Jahangiri
+
+        Permission is hereby granted, free of charge, to any person obtaining a copy
+        of this software and associated documentation files (the "Software"), to deal
+        in the Software without restriction, including without limitation the rights
+        to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+        copies of the Software, and to permit persons to whom the Software is
+        furnished to do so, subject to the following conditions:
+
+        The above copyright notice and this permission notice shall be included in all
+        copies or substantial portions of the Software.
+
+        THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+        IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+        FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+        AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+        LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+        OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+        SOFTWARE.
+*/
 package com.datagen.OutputGenerator;
 
 import java.io.BufferedOutputStream;
 import java.text.DecimalFormat;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
@@ -38,6 +59,7 @@ public abstract class AWisconsinOutputGenerator {
     private static final DecimalFormat decFormat = new DecimalFormat("#.######");
     //TODO: totalFileSize should be calculated from the record size to know the exact start and end row index(if the file size is deciding where we finish instead of number of records
     public double totalFileSize;
+    public Map<Long, Integer> sizeToCount;
 
 
     public AWisconsinOutputGenerator(Schema schema, List<WisconsinGenerator> generators) {
@@ -49,6 +71,7 @@ public abstract class AWisconsinOutputGenerator {
         this.maxRecordLength = 0;
         this.totalFileSize = 0;
         this.executorsToStartAndEnd = new HashMap<>();
+        this.sizeToCount = new HashMap<>();
     }
 
     private void initExecutors() {
@@ -85,11 +108,10 @@ public abstract class AWisconsinOutputGenerator {
             shutDownExecutors();
 
     }
-
     private void executorTask(int readerId) {
         int batchIndex = 0; // batch1, batch2,...
         int batchSize = Integer.valueOf(Server.couchbaseConfiguration.get(Server.BATCHSIZE_NAME)); // Maximum number of records in a batch
-        int fileSize = Integer.valueOf(Server.couchbaseConfiguration.get(Server.FILESIZE_NAME));
+        long fileSize = Long.valueOf(Server.couchbaseConfiguration.get(Server.FILESIZE_NAME));
         int cardinality = Integer.valueOf(Server.couchbaseConfiguration.get(Server.CARDINALITY_NAME));
         int recordCount = 0;
         long totalRecordLength = 0;
@@ -134,7 +156,7 @@ public abstract class AWisconsinOutputGenerator {
                         currentRecordsize += ((String) val).length();
                     } else if (generators.get(i).getDataType() == DataType.INTEGER) {
                         record = record + val;
-                        currentRecordsize += schema.getFields().get(i).getSizeInBytes(cardinality);
+                        currentRecordsize += 8;
                     }
                 } catch (Exception e) {
                     LOGGER.error(e);
@@ -150,6 +172,12 @@ public abstract class AWisconsinOutputGenerator {
                 batchOfRecords.clear();
             }
             batchOfRecords.add(record);
+
+            if (!sizeToCount.containsKey(currentRecordsize)){
+                sizeToCount.put(currentRecordsize,0);
+            }
+            int count = sizeToCount.get(currentRecordsize);
+            sizeToCount.put(currentRecordsize, count+1);
 
             totalFileSize += currentRecordsize;
             if (currentRecordsize > maxRecordLength) {
@@ -175,7 +203,182 @@ public abstract class AWisconsinOutputGenerator {
 
         // Calculate and print string length on average
         LOGGER.info(printStringLengthInfo());
+        LOGGER.info(Arrays.asList(sizeToCount));
+
     }
+
+//    private void executorTask(int readerId) {
+//        int batchIndex = 0; // batch1, batch2,...
+//        int batchSize = Integer.valueOf(Server.couchbaseConfiguration.get(Server.BATCHSIZE_NAME)); // Maximum number of records in a batch
+//        long fileSize = Long.valueOf(Server.couchbaseConfiguration.get(Server.FILESIZE_NAME));
+//        int cardinality = Integer.valueOf(Server.couchbaseConfiguration.get(Server.CARDINALITY_NAME));
+//        int recordCount = 0;
+//        long totalRecordLength = 0;
+//        long minRecordLength = Long.MAX_VALUE;
+//        long startTime = System.currentTimeMillis();
+//        List<String> batchOfRecords = new LinkedList<>();
+//
+//        LOGGER.info("start index: " + executorsToStartAndEnd.get(readerId).getKey() + " end index: "
+//                + executorsToStartAndEnd.get(readerId).getValue());
+//
+//        for (long id = executorsToStartAndEnd.get(readerId).getKey(); id <= executorsToStartAndEnd.get(readerId)
+//                .getValue(); id++) {
+//            if (fileSize > 0 && totalFileSize >= fileSize * 1024 * 1024){
+//                break;
+//            }
+//            if (id % batchSize == 0){
+//                LOGGER.info("Thread "+ readerId +" Created " + id  + " records in "
+//                        + Utils.getPrintableTimeDifference(startTime, System.currentTimeMillis()));
+//            }
+//            long currentRecordsize = 0;
+//            String record = "{";
+//            String values="";
+//            boolean allFieldsNull= true;
+//            for (int i = 0; i < schema.getFields().size(); i++) {
+//                boolean comma = record.equalsIgnoreCase("{") ? false : true;
+//                if (comma) {
+//                    record = record + ", ";
+//                }
+//                Object val = generators.get(i).next(id);
+//                if (val == null) {
+//                    LOGGER.warn("A null value was generated which is not supported currently. Skipped...");
+//                    continue;
+//                }
+//                try {
+//                    allFieldsNull = false;
+//                    record = record + "\"" + schema.getFields().get(i).getName() + "\":";
+//                    if (generators.get(i).getDataType() == DataType.BINARY) {
+//                        record = record + "hex(\"" + val + "\")";
+//                    } else if (generators.get(i).getDataType() == DataType.STRING) {
+//                        record = record + "\"" + val + "\"";
+//                    } else if (generators.get(i).getDataType() == DataType.INTEGER) {
+//                        record = record + val;
+//                    }
+//                } catch (Exception e) {
+//                    LOGGER.error(e);
+//                }
+//                values += val;
+//            }
+//            record = record + "}\n";
+//            if (allFieldsNull)
+//                continue;
+//            if (batchOfRecords.size() >= batchSize){
+//                // Empty the batch
+//                write(readerId, batchOfRecords, batchIndex);
+//                batchIndex++;
+//                batchOfRecords.clear();
+//            }
+//            batchOfRecords.add(record);
+//            currentRecordsize = values.getBytes().length;
+//            totalFileSize += currentRecordsize;
+//            if (currentRecordsize > maxRecordLength) {
+//                maxRecordLength = currentRecordsize;
+//            } else if (currentRecordsize < minRecordLength) {
+//                minRecordLength = currentRecordsize;
+//            }
+//            totalRecordLength += currentRecordsize;
+//            recordCount++;
+//        }
+//        if (batchOfRecords.size() > 0) {
+//            write(readerId, batchOfRecords, batchIndex);
+//        }
+//        closeWriter(readerId);
+//
+//        // Stats info logging
+//        LOGGER.info("Thread "+ readerId +" Processed " + recordCount + " in " + Utils.getPrintableTimeDifference(startTime, System.currentTimeMillis()));
+//        LOGGER.info(
+//                "Record Generation Done. recordCount: " + recordCount + " minRecordLength: " + minRecordLength
+//                        + " maxRecordLength: " + maxRecordLength + " totalRecordLength: " + totalRecordLength+
+//                        " totalFileSize: "+ (totalFileSize/(double)1024/(double)1024)+" (MB)"+
+//                        " avg record length: " + decFormat.format((double) totalRecordLength / recordCount));
+//
+//        // Calculate and print string length on average
+//        LOGGER.info(printStringLengthInfo());
+//    }
+
+//    private void executorTask(int readerId) {
+//        int batchIndex = 0; // batch1, batch2,...
+//        int batchSize = Integer.valueOf(Server.couchbaseConfiguration.get(Server.BATCHSIZE_NAME)); // Maximum number of records in a batch
+//        long fileSize = Long.valueOf(Server.couchbaseConfiguration.get(Server.FILESIZE_NAME));
+//        int cardinality = Integer.valueOf(Server.couchbaseConfiguration.get(Server.CARDINALITY_NAME));
+//        int recordCount = 0;
+//        long totalRecordLength = 0;
+//        long minRecordLength = Long.MAX_VALUE;
+//        long startTime = System.currentTimeMillis();
+//        List<String> batchOfRecords = new LinkedList<>();
+//
+//        LOGGER.info("start index: " + executorsToStartAndEnd.get(readerId).getKey() + " end index: "
+//                + executorsToStartAndEnd.get(readerId).getValue());
+//
+//        for (long id = executorsToStartAndEnd.get(readerId).getKey(); id <= executorsToStartAndEnd.get(readerId)
+//                .getValue(); id++) {
+//            if (fileSize > 0 && totalFileSize >= fileSize * 1024 * 1024){
+//                break;
+//            }
+//            if (id % batchSize == 0){
+//                LOGGER.info("Thread "+ readerId +" Created " + id  + " records in "
+//                        + Utils.getPrintableTimeDifference(startTime, System.currentTimeMillis()));
+//            }
+//            long currentRecordsize = 0;
+//            String record = "";
+//
+//            boolean allFieldsNull= true;
+//            for (int i = 0; i < schema.getFields().size(); i++) {
+//
+//                Object val = generators.get(i).next(id);
+//                if (val == null) {
+//                    LOGGER.warn("A null value was generated which is not supported currently. Skipped...");
+//                    continue;
+//                }
+//                try {
+//                    allFieldsNull = false;
+//                  //  record = record + "\"" + schema.getFields().get(i).getName() + "\":";
+//                   if (generators.get(i).getDataType() == DataType.STRING) {
+//                        record = record + val;
+//                        //currentRecordsize += ((String) val).length();
+//                    } else if (generators.get(i).getDataType() == DataType.INTEGER) {
+//                        record = record + val;
+//                        //currentRecordsize += 8;
+//                    }
+//                } catch (Exception e) {
+//                    LOGGER.error(e);
+//                }
+//            }
+//            if (allFieldsNull)
+//                continue;
+//            if (batchOfRecords.size() >= batchSize){
+//                // Empty the batch
+//                write(readerId, batchOfRecords, batchIndex);
+//                batchIndex++;
+//                batchOfRecords.clear();
+//            }
+//            batchOfRecords.add(record);
+//            currentRecordsize+= record.getBytes().length;
+//            totalFileSize += currentRecordsize;
+//            if (currentRecordsize > maxRecordLength) {
+//                maxRecordLength = currentRecordsize;
+//            } else if (currentRecordsize < minRecordLength) {
+//                minRecordLength = currentRecordsize;
+//            }
+//            totalRecordLength += currentRecordsize;
+//            recordCount++;
+//        }
+//        if (batchOfRecords.size() > 0) {
+//            write(readerId, batchOfRecords, batchIndex);
+//        }
+//        closeWriter(readerId);
+//
+//        // Stats info logging
+//        LOGGER.info("Thread "+ readerId +" Processed " + recordCount + " in " + Utils.getPrintableTimeDifference(startTime, System.currentTimeMillis()));
+//        LOGGER.info(
+//                "Record Generation Done. recordCount: " + recordCount + " minRecordLength: " + minRecordLength
+//                        + " maxRecordLength: " + maxRecordLength + " totalRecordLength: " + totalRecordLength+
+//                        " totalFileSize: "+ (totalFileSize/(double)1024/(double)1024)+" (MB)"+
+//                        " avg record length: " + decFormat.format((double) totalRecordLength / recordCount));
+//
+//        // Calculate and print string length on average
+//        LOGGER.info(printStringLengthInfo());
+//    }
     private void shutDownExecutors() {
         try {
             executorService.shutdown();

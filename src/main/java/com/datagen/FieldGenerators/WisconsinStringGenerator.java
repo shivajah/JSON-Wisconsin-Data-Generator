@@ -1,3 +1,23 @@
+/*Copyright (c) 2020 Shiva Jahangiri
+
+        Permission is hereby granted, free of charge, to any person obtaining a copy
+        of this software and associated documentation files (the "Software"), to deal
+        in the Software without restriction, including without limitation the rights
+        to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+        copies of the Software, and to permit persons to whom the Software is
+        furnished to do so, subject to the following conditions:
+
+        The above copyright notice and this permission notice shall be included in all
+        copies or substantial portions of the Software.
+
+        THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+        IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+        FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+        AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+        LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+        OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+        SOFTWARE.
+*/
 package com.datagen.FieldGenerators;
 
 import java.io.BufferedWriter;
@@ -36,6 +56,8 @@ public class WisconsinStringGenerator extends WisconsinGenerator {
     //    NormalDistribution nd;
     GammaDistribution gd;
     Field f;
+    boolean firstTime = true;
+    ZipfGenerator zipfGenerator;
 
     // To write the rawdata of gamma distribution.
     BufferedWriter writer = null;
@@ -82,11 +104,14 @@ public class WisconsinStringGenerator extends WisconsinGenerator {
                 return generateRandomHexCharsGaussian(f.getStringLength(), f.getStandardDeviation());
             } else if (f.isBernoulliDistribution()) {
                 // Bernoulli Distribution: with some probability the record is large
-                if (r.nextFloat() <= f.getProbLargeRecord()) {
+                if (r.nextFloat() < f.getProbLargeRecord()) {
                     return generateRandomHexCharsUniformDist(f.getMinSizeLarge(), f.getMaxSizeLarge());
                 }
                 return generateRandomHexCharsUniformDist(f.getMinSizeSmall(), f.getMaxSizeSmall());
-            } else {
+            } else if (f.isZipfDistribution()) {
+                return generateRandomHexCharsZipfianDist(f.getZipfMinSize(), f.getZipfMaxSize(), f.getZipfSkew());
+            }
+            else {
                 // Gamma distribution case...
                 // Variable length hex char string generation
                 // For this case, the length is regarded as the average length.
@@ -215,6 +240,19 @@ public class WisconsinStringGenerator extends WisconsinGenerator {
         assert(rangeSize > 0);
         int stringLength = r.nextInt(rangeSize + 1) + minSize;
         return generateRandomHexChars(stringLength);
+    }
+
+    private String generateRandomHexCharsZipfianDist(int minSize, int maxSize,double skew) {
+
+        if (firstTime) {
+            int rangeSize = maxSize - minSize;
+            assert (rangeSize > 0);
+            zipfGenerator = new ZipfGenerator(rangeSize + 1, skew);
+        }
+        firstTime = false;
+        int rank = zipfGenerator.next(); // a number in the range of max-min
+        int stringLength =  rank + minSize;
+        return  generateRandomHexChars(stringLength);
     }
 
     public long getHexStringLength() {

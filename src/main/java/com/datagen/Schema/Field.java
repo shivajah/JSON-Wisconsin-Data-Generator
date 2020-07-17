@@ -1,11 +1,28 @@
+/*Copyright (c) 2020 Shiva Jahangiri
+
+        Permission is hereby granted, free of charge, to any person obtaining a copy
+        of this software and associated documentation files (the "Software"), to deal
+        in the Software without restriction, including without limitation the rights
+        to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+        copies of the Software, and to permit persons to whom the Software is
+        furnished to do so, subject to the following conditions:
+
+        The above copyright notice and this permission notice shall be included in all
+        copies or substantial portions of the Software.
+
+        THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+        IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+        FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+        AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+        LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+        OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+        SOFTWARE.
+*/
 package com.datagen.Schema;
 
 import com.datagen.Constants.DataTypes;
 import com.datagen.Constants.Order;
 
-/**
- * Created by shiva on 3/1/18.
- */
 public class Field {
     private DataTypes.DataType type;
     private String name;
@@ -36,7 +53,24 @@ public class Field {
     private int maxSizeSmall = 32 * 1024 - 1;
     private int minSizeLarge = 32 * 1024;
     private int maxSizeLarge = 5 * 32 * 1024;
+    private boolean zipfDistribution =false;
+    private int zipfMinSize=0;
+    private int zipfMaxSize=30720;
+    private double zipfSkew =2;
 
+    public boolean isZipfDistribution() {
+        return zipfDistribution;
+    }
+    public int getZipfMinSize(){
+        return zipfMinSize;
+    }
+    public int getZipfMaxSize(){
+        return zipfMaxSize;
+    }
+
+    public double getZipfSkew(){
+        return zipfSkew;
+    }
 
     public long getSizeInBytes(long cardinality) {
         if (range > 0) {
@@ -250,4 +284,20 @@ public class Field {
     public void setMaxSizeLarge(int maxSizeLarge) {
         this.maxSizeLarge = maxSizeLarge;
     }
+    public void setZipfDistribution(boolean zipfDistribution) {
+        this.zipfDistribution = zipfDistribution;
+    }
+
+    public void setZipfMinSize(int zipfMinSize) {
+        this.zipfMinSize = zipfMinSize;
+    }
+
+    public void setZipfMaxSize(int zipfMaxSize) {
+        this.zipfMaxSize = zipfMaxSize;
+    }
+
+    public void setZipfSkew(double zipfSkew) {
+        this.zipfSkew = zipfSkew;
+    }
+
 }

@@ -1,6 +1,3 @@
-/*
- * Copyright 2019 Couchbase, Inc.
- */
 /*Copyright (c) 2020 Shiva Jahangiri
 
         Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -33,8 +30,8 @@ import com.datagen.OutputGenerator.WisconsinAsterixDBLoadOutputGenerator;
 import com.datagen.OutputGenerator.WisconsinCouchbaseLoadOutputGenerator;
 import com.datagen.OutputGenerator.WisconsinFileOutputGenerator;
 import com.datagen.Parser.Parser;
-import com.datagen.Schema.Field;
-import com.datagen.Schema.Schema;
+import com.datagen.schema.Field;
+import com.datagen.schema.Schema;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 

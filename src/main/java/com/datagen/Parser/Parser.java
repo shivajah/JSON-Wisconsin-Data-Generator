@@ -26,8 +26,8 @@ import java.util.List;
 
 import com.datagen.Constants.DataTypes;
 import com.datagen.Constants.Order;
-import com.datagen.Schema.Field;
-import com.datagen.Schema.Schema;
+import com.datagen.schema.Field;
+import com.datagen.schema.Schema;
 import com.datagen.Server;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.core.type.TypeReference;
@@ -67,6 +67,7 @@ public class Parser {
             field.setVariableLength(f.variableLength);
             field.setWord(f.word);
             field.setNormalDistribution(f.normalDistribution);
+            field.setGammaDistribution(f.gammaDistribution);
             field.setStandardDeviation(f.standardDeviation);
             field.setShape(f.shape);
             field.setScale(f.scale);
@@ -80,6 +81,7 @@ public class Parser {
             field.setZipfMinSize(f.zipfMinSize);
             field.setZipfMaxSize(f.zipfMaxSize);
             field.setZipfSkew(f.zipfSkew);
+            field.setNumberOfDupicatesOfNegOne(f.numberOfDupicatesOfNegOne);
             Order.order order = (f.order.equalsIgnoreCase("random") ? Order.order.RANDOM
                     : (f.order.equalsIgnoreCase("sequential") ? Order.order.SEQUENTIAL : null));
             field.setOrder(order);

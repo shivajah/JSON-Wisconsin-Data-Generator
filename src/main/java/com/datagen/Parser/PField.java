@@ -38,7 +38,8 @@ public class PField {
     public boolean word = false;
     public double standardDeviation = 0.0;
     // normal distribution? Or gamma distribution?
-    public boolean normalDistribution = true;
+    public boolean normalDistribution = false;
+    public boolean gammaDistribution = false;
     // shape and scale in the gamma distribution
     public double shape = 1.5;
     public double scale = 1.5;
@@ -55,4 +56,5 @@ public class PField {
     public int zipfMinSize=0;
     public int zipfMaxSize=30720;
     public double zipfSkew =2;
+    public int numberOfDupicatesOfNegOne=0;
 }

@@ -18,7 +18,7 @@
         OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
         SOFTWARE.
 */
-package com.datagen.Schema;
+package com.datagen.schema;
 
 import com.datagen.Constants.DataTypes;
 import com.datagen.Constants.Order;
@@ -39,6 +39,7 @@ public class Field {
     private boolean variableLength;
     // true: normal distribution, false: gamma distribution
     private boolean normalDistribution;
+    private boolean gammaDistribution;
     // For the gamma distribution
     private double shape = 1.5;
     private double scale = 1.5;
@@ -57,6 +58,7 @@ public class Field {
     private int zipfMinSize=0;
     private int zipfMaxSize=30720;
     private double zipfSkew =2;
+    private int NumberOfDupicatesOfNegOne=0;
 
     public boolean isZipfDistribution() {
         return zipfDistribution;
@@ -216,11 +218,17 @@ public class Field {
     public boolean isNormalDistribution() {
         return normalDistribution;
     }
+    public boolean isGammaDistribution() {
+        return gammaDistribution;
+    }
 
     public void setNormalDistribution(boolean normalDistribution) {
         this.normalDistribution = normalDistribution;
     }
 
+    public void setGammaDistribution(boolean gammaDistribution) {
+        this.gammaDistribution = gammaDistribution;
+    }
     public double getShape() {
         return shape;
     }
@@ -300,4 +308,11 @@ public class Field {
         this.zipfSkew = zipfSkew;
     }
 
+    public void setNumberOfDupicatesOfNegOne(int NumberOfDupicatesOfNegOne) {
+        this.NumberOfDupicatesOfNegOne = NumberOfDupicatesOfNegOne;
+    }
+
+    public int getNumberOfDupicatesOfNegOne() {
+        return this.NumberOfDupicatesOfNegOne;
+    }
 }

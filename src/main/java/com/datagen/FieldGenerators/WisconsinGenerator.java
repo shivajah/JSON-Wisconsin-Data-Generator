@@ -23,7 +23,7 @@ package com.datagen.FieldGenerators;
 import java.util.Random;
 
 import com.datagen.Constants.DataTypes.DataType;
-import com.datagen.Schema.Schema;
+import com.datagen.schema.Schema;
 import com.datagen.Server;
 
 public abstract class WisconsinGenerator {

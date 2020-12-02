@@ -21,7 +21,7 @@
 package com.datagen.OutputGenerator;
 
 import com.datagen.FieldGenerators.WisconsinGenerator;
-import com.datagen.Schema.Schema;
+import com.datagen.schema.Schema;
 import com.datagen.Server;
 
 import java.io.BufferedOutputStream;

@@ -35,7 +35,7 @@ import com.couchbase.client.java.env.CouchbaseEnvironment;
 import com.couchbase.client.java.env.DefaultCouchbaseEnvironment;
 import com.couchbase.client.java.util.retry.RetryBuilder;
 import com.datagen.FieldGenerators.WisconsinGenerator;
-import com.datagen.Schema.Schema;
+import com.datagen.schema.Schema;
 import com.datagen.Server;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;

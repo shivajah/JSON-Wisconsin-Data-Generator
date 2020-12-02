@@ -41,7 +41,7 @@ import com.datagen.Utils.Utils;
 import com.datagen.Constants.DataTypes.DataType;
 import com.datagen.FieldGenerators.WisconsinGenerator;
 import com.datagen.FieldGenerators.WisconsinStringGenerator;
-import com.datagen.Schema.Schema;
+import com.datagen.schema.Schema;
 
 public abstract class AWisconsinOutputGenerator {
 
@@ -88,7 +88,7 @@ public abstract class AWisconsinOutputGenerator {
         long length = cardinality / partitions;
         long start;
         for (int i = 0; i < partitions; i++) {
-            start = length * i;
+            start = Math.max(1,length * i);
             Pair<Long, Long> p = i == partitions - 1 ? new Pair<>(start, cardinality):
                     new Pair<>(start, start + length);
             executorsToStartAndEnd.put(i, p);

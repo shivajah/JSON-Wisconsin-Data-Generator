@@ -18,8 +18,8 @@
         OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
         SOFTWARE.
 */
-package com.datagen.FieldGenerators;
 
+package com.datagen.FieldGenerators;
 import java.io.BufferedWriter;
 import java.io.FileWriter;
 import java.io.IOException;
@@ -35,8 +35,8 @@ import org.apache.commons.math3.distribution.GammaDistribution;
 import com.datagen.Constants.DataTypes.DataType;
 import com.datagen.Constants.Order;
 import com.datagen.Constants.StringWordList;
-import com.datagen.Schema.Field;
-import com.datagen.Schema.Schema;
+import com.datagen.schema.Field;
+import com.datagen.schema.Schema;
 
 public class WisconsinStringGenerator extends WisconsinGenerator {
     private static final char[] VALUES = { '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'A', 'B', 'C', 'D', 'E',
@@ -56,7 +56,6 @@ public class WisconsinStringGenerator extends WisconsinGenerator {
     //    NormalDistribution nd;
     GammaDistribution gd;
     Field f;
-    boolean firstTime = true;
     ZipfGenerator zipfGenerator;
 
     // To write the rawdata of gamma distribution.
@@ -82,6 +81,16 @@ public class WisconsinStringGenerator extends WisconsinGenerator {
             gd = new GammaDistribution(f.getShape(), f.getScale());
             writer = new BufferedWriter(new FileWriter(fileName));
         }
+        if (f.isZipfDistribution()) {
+            if (f.isWord()) {
+                int bound = Math.min(wordListSize, f.getRange());
+                zipfGenerator = new ZipfGenerator(bound, f.getZipfSkew());
+            } else {
+                int rangeSize = f.getZipfMaxSize() - f.getZipfMinSize();
+                assert (rangeSize > 0);
+                zipfGenerator = new ZipfGenerator(rangeSize + 1, f.getZipfSkew());
+            }
+        }
     }
 
     public String next(long seed) {
@@ -90,6 +99,20 @@ public class WisconsinStringGenerator extends WisconsinGenerator {
         }
         if (f.getRange() > 0) {
             seed = seed % f.getRange();
+        }
+
+        if (f.isWord() ) {
+            if(f.isZipfDistribution()) {
+                //Zipf distribution is for join skew not field length.
+                int rank = zipfGenerator.next();
+                String word = wordList.getWordList().get(rank);
+                return addPaddingX(word, f.isVariableLength());
+            } else {//uniform
+                int bound = Math.min(f.getRange(), wordListSize);
+                int rank = r.nextInt(bound);
+                return addPaddingX(wordList.getWordList().get(rank),f.isVariableLength());
+
+            }
         }
 
         if (f.isVariableLength()) {
@@ -109,7 +132,7 @@ public class WisconsinStringGenerator extends WisconsinGenerator {
                 }
                 return generateRandomHexCharsUniformDist(f.getMinSizeSmall(), f.getMaxSizeSmall());
             } else if (f.isZipfDistribution()) {
-                return generateRandomHexCharsZipfianDist(f.getZipfMinSize(), f.getZipfMaxSize(), f.getZipfSkew());
+                return generateRandomHexCharsZipfianDist(f.getZipfMinSize());
             }
             else {
                 // Gamma distribution case...
@@ -137,12 +160,12 @@ public class WisconsinStringGenerator extends WisconsinGenerator {
             field[i] = temp.pop();
             i++;
         }
-        return addPaddingX(String.valueOf(field), schema.getFields().get(fieldId).isVariableLength());
+        return addPaddingX(String.valueOf(field), f.isVariableLength());
     }
 
     private String addPaddingX(String value, boolean variableLength) {
-        int stLen = schema.getFields().get(fieldId).getStringLength();
-        int diff = stLen - value.length();
+        int stLen = f.getStringLength();
+        int diff = Math.max(0,stLen - value.length());
         if (variableLength) {
             diff = r.nextInt(diff);
         }
@@ -242,14 +265,7 @@ public class WisconsinStringGenerator extends WisconsinGenerator {
         return generateRandomHexChars(stringLength);
     }
 
-    private String generateRandomHexCharsZipfianDist(int minSize, int maxSize,double skew) {
-
-        if (firstTime) {
-            int rangeSize = maxSize - minSize;
-            assert (rangeSize > 0);
-            zipfGenerator = new ZipfGenerator(rangeSize + 1, skew);
-        }
-        firstTime = false;
+    private String generateRandomHexCharsZipfianDist(int minSize) {
         int rank = zipfGenerator.next(); // a number in the range of max-min
         int stringLength =  rank + minSize;
         return  generateRandomHexChars(stringLength);

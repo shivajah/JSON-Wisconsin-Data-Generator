@@ -129,10 +129,18 @@ The output of the program is a set of JSON objects where each object represents 
 ```
 
 ### Usage:
-> export DATAGEN_HOME=$HOME/datagen
-
-> cd $DATAGEN_HOME
-
+1.  Checkout the [JSON Wisconsin Data Generator](https://github.com/shivajah/JSON-Wisconsin-Data-Generator) in a directory using git. In this document we assume that the path of the mentioned directory is $HOME/JsonWiscDataGen and we will refer to it as JSONWISCDATAGEN_HOME. You can choose any other directory as the home directory for JSON Wisconsin Data Generator.
+2.  Set the $HOME/JsonWiscDataGen as an environment variable on your machine using the following command:
+> export JSONWISCDATAGEN_HOME=$HOME/JsonWiscDataGen
+3.   Go to the home directory of JSON Wisconsin Data Generator
+> cd $JSONWISCDATAGEN_HOME
+4.  Build the data generator using maven as follow:
 > mvn clean package 
+5.  If the build is successful, a target folder will be created which contains the required jar file and dependencies. The workload file providing the schema and other relation information for Json Wisconsin Data Generator should be created as a json file in '$JSONWISCDATAGEN_HOME/Workloads' directory. There are some example workloads including the default workload in this folder. You can start creating your own workload file using these examples and information provided here.
+6. You can start generating the dataset by running the following command:
 
-> $DATAGEN_HOME/scripts/run_datagen.sh workload=wisconsin_1GB_std_zero_fixedLength_noBigObject.json writer=couchbase(default = file)
+> java -jar $JSONWISCDATAGEN_HOME/target/wisconsin-datagen.jar writer=file workload=default.json  cardinality=99999999
+
+7. Default configurations are provided in $JSONWISCDATAGEN_HOMEB/src/main/resources/wisconsin_datagen.properties which can be overwritten similar to the above example (step 6).
+-   filesize: In MB, which would be another terminator for the program. Program will stop generating records if the asked cardinality of filesize is reached. Whichever that happen first, would be the terminator.
+-   writer: asterixdb or file. "file" writes the output to a file in target folder with the name provided in "fileoutput". "asterixdb" writer loads the records directly to AsterixDB using AsterixDBLoadPort. For using the asterixdb writer, data generator should run on one of the NC nodes for it in order to work properly.

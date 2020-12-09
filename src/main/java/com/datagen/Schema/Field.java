@@ -26,11 +26,10 @@ import com.datagen.Constants.Order;
 public class Field {
     private DataTypes.DataType type;
     private String name;
-    private boolean declared;
     private boolean optional;
     private boolean nullable;
-    private int nulls;
-    private int missings;
+    private double nulls;
+    private double missings;
     private Order.order order;
     private int stringLength;
     private int range;
@@ -40,6 +39,8 @@ public class Field {
     // true: normal distribution, false: gamma distribution
     private boolean normalDistribution;
     private boolean gammaDistribution;
+    //For normal distribution
+    private double mean = 1;
     // For the gamma distribution
     private double shape = 1.5;
     private double scale = 1.5;
@@ -58,7 +59,6 @@ public class Field {
     private int zipfMinSize=0;
     private int zipfMaxSize=30720;
     private double zipfSkew =2;
-    private int NumberOfDupicatesOfNegOne=0;
 
     public boolean isZipfDistribution() {
         return zipfDistribution;
@@ -74,28 +74,17 @@ public class Field {
         return zipfSkew;
     }
 
-    public long getSizeInBytes(long cardinality) {
-        if (range > 0) {
-            cardinality = range;
-        }
-        if (type == DataTypes.DataType.INTEGER) {
-            if (cardinality <= 127 && cardinality >= -128) {//tinyint
-                return 1; //Byte
-            } else if (cardinality <= 32767 && cardinality >= -32768) {//smallint
-                return 2;
-            } else if (cardinality <= 2147483647 && cardinality >= -2147483648) {//int
-                return 4;
-            } else {//bigint
-                return 8;
-            }
-        } else if (type == DataTypes.DataType.STRING || type == DataTypes.DataType.BINARY) {
-            return stringLength * Character.BYTES;
-        }
-        return 0;
-    }
-
     public int getRange() {
         return range;
+    }
+
+
+    public double getMean() {
+        return mean;
+    }
+
+    public void setMean(double mean) {
+        this.mean = mean;
     }
 
     public void setRange(int range) {
@@ -116,14 +105,6 @@ public class Field {
 
     public void setName(String name) {
         this.name = name;
-    }
-
-    public boolean isDeclared() {
-        return declared;
-    }
-
-    public void setDeclared(boolean declared) {
-        this.declared = declared;
     }
 
     public Order.order getOrder() {
@@ -159,19 +140,19 @@ public class Field {
         this.nullable = nullable;
     }
 
-    public int getNulls() {
+    public double getNulls() {
         return nulls;
     }
 
-    public void setNulls(int nulls) {
+    public void setNulls(double nulls) {
         this.nulls = nulls;
     }
 
-    public int getMissings() {
+    public double getMissings() {
         return missings;
     }
 
-    public void setMissings(int missings) {
+    public void setMissings(double missings) {
         this.missings = missings;
     }
 
@@ -308,11 +289,4 @@ public class Field {
         this.zipfSkew = zipfSkew;
     }
 
-    public void setNumberOfDupicatesOfNegOne(int NumberOfDupicatesOfNegOne) {
-        this.NumberOfDupicatesOfNegOne = NumberOfDupicatesOfNegOne;
-    }
-
-    public int getNumberOfDupicatesOfNegOne() {
-        return this.NumberOfDupicatesOfNegOne;
-    }
 }

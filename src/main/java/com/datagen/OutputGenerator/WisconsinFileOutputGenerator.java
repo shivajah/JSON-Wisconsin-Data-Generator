@@ -20,7 +20,7 @@
 */
 package com.datagen.OutputGenerator;
 
-import com.datagen.FieldGenerators.WisconsinGenerator;
+import com.datagen.FieldGenerators.AWisconsinGenerator;
 import com.datagen.schema.Schema;
 import com.datagen.Server;
 
@@ -33,7 +33,7 @@ import java.util.stream.IntStream;
 
 public class WisconsinFileOutputGenerator extends AWisconsinOutputGenerator {
 
-    public WisconsinFileOutputGenerator(Schema schema, List<WisconsinGenerator> generators) {
+    public WisconsinFileOutputGenerator(Schema schema, List<AWisconsinGenerator> generators) {
         super(schema, generators);
         initiate();
     }
@@ -61,11 +61,10 @@ public class WisconsinFileOutputGenerator extends AWisconsinOutputGenerator {
     @Override
     public void initiate() {
         super.initiate();
-        //TODO: use schema file name for this purpose
-        String filePrefix = Server.couchbaseConfiguration.get(Server.FILEOUTPUT_NAME).split(".adm")[0];
+        String filePrefix = Server.JSONDataGenConfiguration.get(Server.FILEOUTPUT_NAME).split(".adm")[0];
         final String fileName = (filePrefix != null) ? directory + filePrefix : directory + "tempFile";
         File f = new File(fileName);
-        IntStream.range(0, Integer.valueOf(Server.couchbaseConfiguration.get(Server.PARTITIONS_NAME))).forEach(readerId -> {
+        IntStream.range(0, Integer.valueOf(Server.JSONDataGenConfiguration.get(Server.PARTITIONS_NAME))).forEach(readerId -> {
             String execFilename = fileName + "p_" + readerId + ".adm";
             File execFile = new File(execFilename);
             try {

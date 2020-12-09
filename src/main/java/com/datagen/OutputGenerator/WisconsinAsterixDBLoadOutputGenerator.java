@@ -20,15 +20,11 @@
 */
 package com.datagen.OutputGenerator;
 
-import com.datagen.FieldGenerators.WisconsinGenerator;
+import com.datagen.FieldGenerators.AWisconsinGenerator;
 import com.datagen.schema.Schema;
 import com.datagen.Server;
 
-import java.io.BufferedOutputStream;
-import java.io.File;
-import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.ObjectOutputStream;
 import java.io.OutputStream;
 import java.io.PrintWriter;
 import java.net.Socket;
@@ -40,7 +36,7 @@ public class WisconsinAsterixDBLoadOutputGenerator extends AWisconsinOutputGener
     Socket sock;
     OutputStream output = null;
     PrintWriter writer;
-    public WisconsinAsterixDBLoadOutputGenerator(Schema schema, List<WisconsinGenerator> generators) {
+    public WisconsinAsterixDBLoadOutputGenerator(Schema schema, List<AWisconsinGenerator> generators) {
         super(schema, generators);
         initiate();
     }
@@ -68,8 +64,8 @@ public class WisconsinAsterixDBLoadOutputGenerator extends AWisconsinOutputGener
     public void initiate() {
         super.initiate();
         try {
-            sock = new Socket(Server.couchbaseConfiguration.get(Server.HOST_NAME_FIELD_NAME),
-                    Integer.parseInt(Server.couchbaseConfiguration.get(Server.ASTERIXDB_LOAD_PORT)));
+            sock = new Socket(Server.JSONDataGenConfiguration.get(Server.HOST_NAME_FIELD_NAME),
+                    Integer.parseInt(Server.JSONDataGenConfiguration.get(Server.ASTERIXDB_LOAD_PORT)));
             output = sock.getOutputStream();
             writer = new PrintWriter(output, true);
 

@@ -29,34 +29,32 @@ import org.apache.commons.math3.distribution.GammaDistribution;
 
 import java.util.Random;
 
-public class WisconsinNumberGenerator extends WisconsinGenerator {
+public class WisconsinNumberGenerator extends AWisconsinGenerator {
     GammaDistribution  gd;
     Random r;
     Field field;
-    int numberOfDuplicatesOfNegOne;
-    int currentNumberOfNegOnes;
 
     public WisconsinNumberGenerator(Schema schema, int fieldId) {
         super(schema, fieldId);
         generatorType = DataType.INTEGER;
-         field = schema.getFields().get(fieldId);
+        field = schema.getFields().get(fieldId);
         gd = new GammaDistribution(field.getShape(), field.getScale());
         r= new Random(fieldId);
-        numberOfDuplicatesOfNegOne = field.getNumberOfDupicatesOfNegOne();
-        currentNumberOfNegOnes = 0;
     }
 
     @Override
     public Object next(long seed) {
-        if (currentNumberOfNegOnes < numberOfDuplicatesOfNegOne) {
-            currentNumberOfNegOnes++;
-            return -1;
-        }
 
         long result;
-        long cardinality = Long.valueOf(Server.couchbaseConfiguration.get(Server.CARDINALITY_NAME));
+        long cardinality = Long.valueOf(Server.JSONDataGenConfiguration.get(Server.CARDINALITY_NAME));
+        ValueType type=getValueType();
+        if (type == ValueType.NULL){
+            return "\"null\"";
+        } else if ( type == ValueType.MISSING){
+            return "#MISSING";
+        }
         // Use cardinality and Jim Gray's algo
-        if (field.getOrder() == Order.order.RANDOM) {
+        if (field.getOrder() != null &&field.getOrder() == Order.order.RANDOM) {
             result = rand(seed, cardinality);
         }
         else
@@ -76,12 +74,11 @@ public class WisconsinNumberGenerator extends WisconsinGenerator {
             long range = field.getRange() > 0? field.getRange():cardinality;
             double sample = gd.sample();
             result = (int)(( sample * result)%range);
-            System.out.print(result+",");
+
         } else if (field.isNormalDistribution()) {
-            long range = field.getRange() > 0 ? field.getRange():cardinality;
-            double stdev = field.getStandardDeviation() >= 1 ? field.getStandardDeviation():
-                    Math.ceil(field.getStandardDeviation()*range);
-            result = (int)(r.nextGaussian() * stdev +(range/2));
+            double mean = field.getMean() > 0? field.getMean():cardinality/2;
+            double stdev = field.getStandardDeviation();
+            result = (int)(r.nextGaussian() * stdev +mean);
             return result;
 
         }

@@ -38,7 +38,7 @@ import com.datagen.Constants.StringWordList;
 import com.datagen.schema.Field;
 import com.datagen.schema.Schema;
 
-public class WisconsinStringGenerator extends WisconsinGenerator {
+public class WisconsinStringGenerator extends AWisconsinGenerator {
     private static final char[] VALUES = { '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'A', 'B', 'C', 'D', 'E',
             'F' };
     private static final DecimalFormat decFormat = new DecimalFormat("#.######");
@@ -53,7 +53,6 @@ public class WisconsinStringGenerator extends WisconsinGenerator {
     int minHexStringLength;
     int hexStringCount;
     char[] returnHexCharValues;
-    //    NormalDistribution nd;
     GammaDistribution gd;
     Field f;
     ZipfGenerator zipfGenerator;
@@ -94,25 +93,17 @@ public class WisconsinStringGenerator extends WisconsinGenerator {
     }
 
     public String next(long seed) {
-        if (f.getOrder() == Order.order.RANDOM) {
-            seed = rand(seed, Long.valueOf(Server.couchbaseConfiguration.get(Server.CARDINALITY_NAME)));
+        ValueType type = getValueType();
+        if ( type ==ValueType.NULL){
+            return "\"null\"";
+        } else if (type ==ValueType.MISSING){
+            return "#MISSING";
+        }
+        if (f.getOrder() != null && f.getOrder() == Order.order.RANDOM) {
+            seed = rand(seed, Long.valueOf(Server.JSONDataGenConfiguration.get(Server.CARDINALITY_NAME)));
         }
         if (f.getRange() > 0) {
             seed = seed % f.getRange();
-        }
-
-        if (f.isWord() ) {
-            if(f.isZipfDistribution()) {
-                //Zipf distribution is for join skew not field length.
-                int rank = zipfGenerator.next();
-                String word = wordList.getWordList().get(rank);
-                return addPaddingX(word, f.isVariableLength());
-            } else {//uniform
-                int bound = Math.min(f.getRange(), wordListSize);
-                int rank = r.nextInt(bound);
-                return addPaddingX(wordList.getWordList().get(rank),f.isVariableLength());
-
-            }
         }
 
         if (f.isVariableLength()) {
@@ -143,24 +134,41 @@ public class WisconsinStringGenerator extends WisconsinGenerator {
                 return result;
             }
         }
+        else {//Fixed Length Records
+            if (f.isWord()) {
+                if (f.isZipfDistribution()) {
+                    //Zipf distribution is for join skew not field length.
+                    int rank = zipfGenerator.next();
+                    String word = wordList.getWordList().get(rank);
+                    return addPaddingX(word, f.isVariableLength());
+                } else {//uniform
+                    int rank = r.nextInt(wordListSize);
+                    if (f.getRange() > 0) {
+                        rank = rank %f.getRange();
+                    }
+                    return addPaddingX(wordList.getWordList().get(rank), f.isVariableLength());
 
-        Stack<Character> temp = new Stack<>();
-        char[] field = { 'A', 'A', 'A', 'A', 'A', 'A', 'A' };
-        if (seed == 0) {
-            long rem = seed % 26;
-            temp.push((char) ('A' + rem));
+                }
+            } else {
+                Stack<Character> temp = new Stack<>();
+                char[] field = { 'A', 'A', 'A', 'A', 'A', 'A', 'A' };
+                if (seed == 0) {
+                    long rem = seed % 26;
+                    temp.push((char) ('A' + rem));
+                }
+                while (seed > 0) {
+                    long rem = seed % 26;
+                    temp.push((char) ('A' + rem));
+                    seed = seed / 26;
+                }
+                int i = 0;
+                while (!temp.empty() && i < field.length) {
+                    field[i] = temp.pop();
+                    i++;
+                }
+                return addPaddingX(String.valueOf(field), f.isVariableLength());
+            }
         }
-        while (seed > 0) {
-            long rem = seed % 26;
-            temp.push((char) ('A' + rem));
-            seed = seed / 26;
-        }
-        int i = 0;
-        while (!temp.empty() && i < field.length) {
-            field[i] = temp.pop();
-            i++;
-        }
-        return addPaddingX(String.valueOf(field), f.isVariableLength());
     }
 
     private String addPaddingX(String value, boolean variableLength) {
@@ -205,7 +213,6 @@ public class WisconsinStringGenerator extends WisconsinGenerator {
                 }
             }
         }
-
         return builder.toString();
     }
 

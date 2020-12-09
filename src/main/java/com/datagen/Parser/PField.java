@@ -26,11 +26,10 @@ public class PField {
     public String order;
     public int length;
     public int range;
-    public boolean declared;
     public boolean optional;
-    public int missings;
+    public double missings;
     public boolean nullable;
-    public int nulls;
+    public double nulls;
     public boolean even;
     public boolean odd;
     public boolean variableLength = false;
@@ -40,6 +39,8 @@ public class PField {
     // normal distribution? Or gamma distribution?
     public boolean normalDistribution = false;
     public boolean gammaDistribution = false;
+    // normal distribution mean
+    public double mean=1;
     // shape and scale in the gamma distribution
     public double shape = 1.5;
     public double scale = 1.5;
@@ -56,5 +57,4 @@ public class PField {
     public int zipfMinSize=0;
     public int zipfMaxSize=30720;
     public double zipfSkew =2;
-    public int numberOfDupicatesOfNegOne=0;
 }

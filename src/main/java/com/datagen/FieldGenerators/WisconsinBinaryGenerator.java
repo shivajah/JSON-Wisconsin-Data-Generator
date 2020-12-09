@@ -28,17 +28,10 @@ import com.datagen.Constants.Order;
 import com.datagen.schema.Field;
 import com.datagen.schema.Schema;
 import com.datagen.Server;
-public class WisconsinBinaryGenerator extends WisconsinGenerator {
-    private static final char[] VALUES = { '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'A', 'B', 'C', 'D', 'E',
-            'F' };
+public class WisconsinBinaryGenerator extends AWisconsinGenerator {
+    private static final char[] VALUES = { '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'A', 'B', 'C', 'D', 'E', 'F' };
     private static final int HEXRANGE = 15;
     Random r;
-
-    public WisconsinBinaryGenerator() {
-        super();
-        r = new Random();
-        generatorType = DataType.BINARY;
-    }
 
     public WisconsinBinaryGenerator(Schema schema, int fieldId) {
         super(schema, fieldId);
@@ -48,31 +41,20 @@ public class WisconsinBinaryGenerator extends WisconsinGenerator {
 
     public String next(long seed) {
         Field f = schema.getFields().get(fieldId);
-        if (nextNull < seed) {
-            nextNull = nextNull(Math.toIntExact(seed));
-            schema.getFields().get(fieldId).setNulls(schema.getFields().get(fieldId).getNulls() + 1);
+        if (getValueType() ==ValueType.NULL){
+            return "\"null\"";
+        } else if (getValueType() ==ValueType.NULL){
+            return "#MISSING";
         }
-        if (nextMissing < seed) {
-            nextMissing = nextMissing(Math.toIntExact(seed));
-            schema.getFields().get(fieldId).setMissings(schema.getFields().get(fieldId).getMissings() + 1);
-        }
-        if (nextNull <= nextMissing && nextNull == seed) {
-            nextNull = nextNull(Math.toIntExact(seed) + 1);
-            return null;
-        }
-        if (nextMissing <= nextNull && nextMissing == seed) {
-            nextMissing = nextMissing(Math.toIntExact(seed) + 1);
-            return "";
-        }
-        if (f.getOrder() == Order.order.RANDOM) {
-            seed = rand(seed, Long.valueOf(Server.couchbaseConfiguration.get(Server.CARDINALITY_NAME)));
+        if (f.getOrder() != null && f.getOrder() == Order.order.RANDOM) {
+            seed = rand(seed, Long.valueOf(Server.JSONDataGenConfiguration.get(Server.CARDINALITY_NAME)));
         }
         if (f.getRange() > 0) {
             seed = seed % f.getRange();
         }
         Stack<Character> temp = new Stack<>();
 
-        // r.setSeed(seed);
+        r.setSeed(seed);
         char nextHex;
         int length = schema.getFields().get(fieldId).getStringLength();
         for (int i = 0; i < length; i++) {

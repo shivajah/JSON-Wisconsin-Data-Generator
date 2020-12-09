@@ -55,7 +55,6 @@ public class Parser {
         for (PField f : pfields) {
             field = new Field();
             field.setName(f.name);
-            field.setDeclared(f.declared);
             field.setNullable(f.nullable);
             field.setNulls(f.nulls);
             field.setOptional(f.optional);
@@ -81,10 +80,10 @@ public class Parser {
             field.setZipfMinSize(f.zipfMinSize);
             field.setZipfMaxSize(f.zipfMaxSize);
             field.setZipfSkew(f.zipfSkew);
-            field.setNumberOfDupicatesOfNegOne(f.numberOfDupicatesOfNegOne);
-            Order.order order = (f.order.equalsIgnoreCase("random") ? Order.order.RANDOM
-                    : (f.order.equalsIgnoreCase("sequential") ? Order.order.SEQUENTIAL : null));
+            Order.order order = f.order==null? null: (f.order.equalsIgnoreCase("random") ? Order.order.RANDOM
+                    : Order.order.SEQUENTIAL);
             field.setOrder(order);
+            field.setMean(f.mean);
             DataTypes.DataType dataType;
 
             if (f.type.equalsIgnoreCase("string")) {
@@ -108,7 +107,7 @@ public class Parser {
 
 
     private void setPrimeAndGenerator(Schema schema) {
-        long cardinality = Long.valueOf(Server.couchbaseConfiguration.get("cardinality"));
+        long cardinality = Long.valueOf(Server.JSONDataGenConfiguration.get("cardinality"));
         long generator;
         long prime;
         if (cardinality <= Math.pow(10, 1)) {

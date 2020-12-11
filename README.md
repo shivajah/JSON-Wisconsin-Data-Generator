@@ -191,5 +191,8 @@ For specifying the optional values, the user should set ```"optional":true``` an
 ## Binary Data type:
 In addition to integer and string data types, we have also introduced Binary data type which generates HEX values.
 
+## Acknowledgement:
+Special thanks to Professor Michael Carey and Professor Johann-Christoph Freytag for their advice and support and to Taewoo Kim for his contribution to the development of variable length strings and binary data types.
+
 
 

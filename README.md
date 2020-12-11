@@ -1,7 +1,7 @@
 This project is under **MIT license** (for this software to be used as part of other project as modified or not modified) and can be referenced in scientific papers, books, journals, etc. upon the usage using **DOI: 10.5281/zenodo.4315680 (http://doi.org/10.5281/zenodo.4315937)**
 
 **Cite as:**
-Shiva Jahangiri. (2020, December 11). shivajah/JSON-Wisconsin-Data-Generator: Proper citation info (Version v1.0.1). Zenodo. http://doi.org/10.5281/zenodo.4315937.
+Shiva Jahangiri. (2020, December 11). shivajah/JSON-Wisconsin-Data-Generator: First Release (Version v1.0.2). Zenodo. http://doi.org/10.5281/zenodo.4316003
 # JSON Wisconsin Data Generator: To JSON and Beyond
 
 [JSON Wisconsin Data Generator](https://github.com/shivajah/JSON-Wisconsin-Data-Generator) is a [Wisconsin](http://jimgray.azurewebsites.net/benchmarkhandbook/chapter4.pdf)-inspired data generator tool implemented in Java. Wisconsin Benchmark was designed at the University of Wisconsin by DeWitt et al to test the performance of the major components of a relational database system while the semantics and statistics of its relations would be easy to understand.  This Benchmark was initially a single-user micro-benchmark for measuring individual query performance. A multi-user version of this benchmark which was developed a few years later did not attract as much as attraction as past, due to existence of other well-established competitors such as DebitCredit Benchmark, a multi-user OLTP benchmark led by Jim Gray.

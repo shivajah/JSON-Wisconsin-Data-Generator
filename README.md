@@ -1,5 +1,6 @@
 This project is under **MIT license** (for this software to be used as part of other project as modified or not modified) and can be referenced in scientific papers, books, journals, etc. upon the usage using **DOI: 10.5281/zenodo.4315680 (http://doi.org/10.5281/zenodo.4315937)**
-Cite as:
+
+**Cite as:**
 Shiva Jahangiri. (2020, December 11). shivajah/JSON-Wisconsin-Data-Generator: Proper citation info (Version v1.0.1). Zenodo. http://doi.org/10.5281/zenodo.4315937.
 # JSON Wisconsin Data Generator: To JSON and Beyond
 

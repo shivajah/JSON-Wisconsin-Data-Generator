@@ -22,8 +22,8 @@ package com.datagen.FieldGenerators;
 
 import com.datagen.Constants.DataTypes.DataType;
 import com.datagen.Constants.Order;
-import com.datagen.schema.Field;
-import com.datagen.schema.Schema;
+import com.datagen.Schema.Field;
+import com.datagen.Schema.Schema;
 import com.datagen.Server;
 import org.apache.commons.math3.distribution.GammaDistribution;
 

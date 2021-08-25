@@ -1,7 +1,7 @@
 package com.datagen.FieldGenerators;
 
 import com.datagen.Constants.DataTypes;
-import com.datagen.schema.Schema;
+import com.datagen.Schema.Schema;
 
 import java.util.Random;
 

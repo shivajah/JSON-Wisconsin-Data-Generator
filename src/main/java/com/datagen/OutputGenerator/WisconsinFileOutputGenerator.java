@@ -21,7 +21,7 @@
 package com.datagen.OutputGenerator;
 
 import com.datagen.FieldGenerators.AWisconsinGenerator;
-import com.datagen.schema.Schema;
+import com.datagen.Schema.Schema;
 import com.datagen.Server;
 
 import java.io.BufferedOutputStream;
@@ -58,21 +58,29 @@ public class WisconsinFileOutputGenerator extends AWisconsinOutputGenerator {
         }
     }
 
-    @Override
     public void initiate() {
         super.initiate();
         String filePrefix = Server.JSONDataGenConfiguration.get(Server.FILEOUTPUT_NAME).split(".adm")[0];
         final String fileName = (filePrefix != null) ? directory + filePrefix : directory + "tempFile";
         File f = new File(fileName);
-        IntStream.range(0, Integer.valueOf(Server.JSONDataGenConfiguration.get(Server.PARTITIONS_NAME))).forEach(readerId -> {
-            String execFilename = fileName + "p_" + readerId + ".adm";
-            File execFile = new File(execFilename);
-            try {
-                execFile.createNewFile();
-                threadToFileOutputStream.put(readerId, new BufferedOutputStream(new FileOutputStream(execFilename)));
-            } catch (IOException ex) {
-                ex.printStackTrace();
-            }
-        });
+        if (Integer.valueOf(Server.JSONDataGenConfiguration.get(Server.PARTITION_NAME)) < 0) {
+            IntStream.range(0, Integer.valueOf(Server.JSONDataGenConfiguration.get(Server.PARTITIONS_NAME))).forEach(readerId -> {
+                createFile(fileName,readerId);
+
+            });
+        } else { // Make File for the only partition that is mentioned
+            createFile(fileName,Integer.valueOf(Server.JSONDataGenConfiguration.get(Server.PARTITION_NAME)));
+        }
+    }
+
+    private void createFile(String fileName, int readerId){
+        String execFilename = fileName + "p_" + readerId + ".adm";
+        File execFile = new File(execFilename);
+        try {
+            execFile.createNewFile();
+            threadToFileOutputStream.put(readerId, new BufferedOutputStream(new FileOutputStream(execFilename)));
+        } catch (IOException ex) {
+            ex.printStackTrace();
+        }
     }
 }

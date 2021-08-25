@@ -41,7 +41,7 @@ import com.datagen.Utils.Utils;
 import com.datagen.Constants.DataTypes.DataType;
 import com.datagen.FieldGenerators.AWisconsinGenerator;
 import com.datagen.FieldGenerators.WisconsinStringGenerator;
-import com.datagen.schema.Schema;
+import com.datagen.Schema.Schema;
 
 public abstract class AWisconsinOutputGenerator {
 

@@ -26,8 +26,8 @@ import java.util.List;
 
 import com.datagen.Constants.DataTypes;
 import com.datagen.Constants.Order;
-import com.datagen.schema.Field;
-import com.datagen.schema.Schema;
+import com.datagen.Schema.Field;
+import com.datagen.Schema.Schema;
 import com.datagen.Server;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.core.type.TypeReference;

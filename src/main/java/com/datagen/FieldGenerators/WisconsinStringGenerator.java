@@ -35,8 +35,8 @@ import org.apache.commons.math3.distribution.GammaDistribution;
 import com.datagen.Constants.DataTypes.DataType;
 import com.datagen.Constants.Order;
 import com.datagen.Constants.StringWordList;
-import com.datagen.schema.Field;
-import com.datagen.schema.Schema;
+import com.datagen.Schema.Field;
+import com.datagen.Schema.Schema;
 
 public class WisconsinStringGenerator extends AWisconsinGenerator {
     private static final char[] VALUES = { '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'A', 'B', 'C', 'D', 'E',

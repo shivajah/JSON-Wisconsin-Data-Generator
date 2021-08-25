@@ -18,7 +18,7 @@
         OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
         SOFTWARE.
 */
-package com.datagen.schema;
+package com.datagen.Schema;
 
 import com.datagen.Constants.DataTypes;
 import com.datagen.Constants.Order;

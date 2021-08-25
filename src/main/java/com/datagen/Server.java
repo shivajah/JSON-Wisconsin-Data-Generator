@@ -29,8 +29,8 @@ import com.datagen.OutputGenerator.AWisconsinOutputGenerator;
 import com.datagen.OutputGenerator.WisconsinAsterixDBLoadOutputGenerator;
 import com.datagen.OutputGenerator.WisconsinFileOutputGenerator;
 import com.datagen.Parser.Parser;
-import com.datagen.schema.Field;
-import com.datagen.schema.Schema;
+import com.datagen.Schema.Field;
+import com.datagen.Schema.Schema;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 

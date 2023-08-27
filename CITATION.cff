@@ -4,7 +4,8 @@ authors:
 - family-names: "Shiva"
   given-names: "Jahangiri"
   orcid: "https://orcid.org/0009-0001-4854-0597"
-title: "JSON Wisconsin Data Generator: To JSON and Beyond"
-version: 1.0.0
+title: "shivajah/JSON-Wisconsin-Data-Generator: Proper citation info"
+version: v1.0.1,
+doi: 10.5281/zenodo.4316003,
 date-released: 2020-12-10
 url: "https://github.com/shivajah/JSON-Wisconsin-Data-Generator"

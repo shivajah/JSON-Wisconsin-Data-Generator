@@ -4,8 +4,7 @@ authors:
 - family-names: "Shiva"
   given-names: "Jahangiri"
   orcid: "https://orcid.org/0009-0001-4854-0597"
-title: {shivajah/JSON-Wisconsin-Data-Generator: First 
-                   Release}
+title: "shivajah/JSON-Wisconsin-Data-Generator: First Release"
 version: v1.0.1,
 doi: 10.5281/zenodo.4316003,
 date-released: 2020-12-10

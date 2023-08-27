@@ -150,7 +150,7 @@ mvn clean package
 5.  If the build is successful, a target folder will be created which contains the required jar file and dependencies. The workload file providing the schema and other relation information for Json Wisconsin Data Generator should be created as a json file in '$JSONWISCDATAGEN_HOME/Workloads' directory. There are some example workloads including the default workload in this folder. You can start creating your own workload file using these examples and information provided here.
 6. You can start generating the dataset by running the following command:
 ```
-java -jar $JSONWISCDATAGEN_HOME/target/wisconsin-datagen.jar writer=file workload=default.json  cardinality=99999999
+java -jar $JSONWISCDATAGEN_HOME/target/wisconsin-datagen.jar writer=file workload=Default.json  cardinality=99999999
 ```
 7. Default configurations are provided in $JSONWISCDATAGEN_HOMEB/src/main/resources/wisconsin_datagen.properties which can be overwritten similar to the above example (step 6).
 -   filesize: In MB, which would be another terminator for the program. Program will stop generating records if the asked cardinality of filesize is reached. Whichever that happen first, would be the terminator.

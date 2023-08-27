@@ -1,0 +1,11 @@
+cff-version: 0.0.1
+message: "If you use this software, please cite it as below."
+authors:
+- family-names: "Shiva"
+  given-names: "Jahangiri"
+  orcid: "https://orcid.org/0009-0001-4854-0597"
+title: "shivajah/JSON-Wisconsin-Data-Generator: First Release"
+version: v1.0.1,
+doi: 10.5281/zenodo.4316003,
+date-released: 2020-12-10
+url: "https://github.com/shivajah/JSON-Wisconsin-Data-Generator"
